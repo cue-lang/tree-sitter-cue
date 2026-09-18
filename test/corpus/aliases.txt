@@ -92,3 +92,37 @@ myLabel~(K, V): value
   (label (identifier))
   (postfix_alias label: (identifier) field: (identifier))
   (value (identifier))))
+===
+postfix alias single parenthesized
+===
+
+myLabel~(X): value
+
+---
+
+(source_file
+	(field
+		(label
+			(identifier))
+		(postfix_alias
+			label: (identifier))
+		(value
+			(identifier))))
+
+===
+postfix alias dual blank
+===
+
+myLabel~(_, V): value
+
+---
+
+(source_file
+	(field
+		(label
+			(identifier))
+		(postfix_alias
+			label: (identifier)
+			field: (identifier))
+		(value
+			(identifier))))

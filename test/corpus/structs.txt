@@ -190,3 +190,49 @@ s2: {
 	(value
 	  (struct_lit
 		(string)))))
+===
+spread operator
+===
+
+#NewOpen1: {
+	#A...
+	b: 1
+}
+
+---
+
+(source_file
+	(field
+		(label
+			(identifier))
+		(value
+			(struct_lit
+				(postfix_expression
+					(identifier))
+				(field
+					(label
+						(identifier))
+					(value
+						(number)))))))
+
+===
+spread in expression
+===
+
+t3: {Old1..., c: 3}
+
+---
+
+(source_file
+	(field
+		(label
+			(identifier))
+		(value
+			(struct_lit
+				(postfix_expression
+					(identifier))
+				(field
+					(label
+						(identifier))
+					(value
+						(number)))))))

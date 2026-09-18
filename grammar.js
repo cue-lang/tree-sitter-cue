@@ -146,6 +146,8 @@ module.exports = grammar({
     [$._embedding, $._label_alias_expr],
     [$._label_name, $.primary_expression],
     [$._label_name, $.string],
+    [$.function_parameter, $.primary_expression],
+    [$.function_parameter, $.top],
   ],
 
   word: $ => $.identifier,
@@ -203,6 +205,8 @@ module.exports = grammar({
         'for',
         'else',
         'try',
+        'self',
+        'func',
         ...primitive_types,
       ),
       $.identifier,
@@ -334,7 +338,12 @@ module.exports = grammar({
       '~',
       choice(
         field('field', $.identifier),
-        seq('(', field('label', $.identifier), ',', field('field', $.identifier), ')'),
+        seq(
+          '(',
+          field('label', $.identifier),
+          optional(seq(',', field('field', $.identifier))),
+          ')',
+        ),
       ),
     ),
 
@@ -378,6 +387,42 @@ module.exports = grammar({
       $.expression,
     ),
 
+    function_expression: $ => prec.right(seq(
+      'func',
+      field('parameters', $.parameter_list),
+      optional(seq('->', field('return_type', $.expression))),
+      optional(seq(':', field('body', $.expression))),
+    )),
+
+    parameter_list: $ => seq(
+      '(',
+      optionalCommaSep1(choice(
+        $.function_parameter,
+        '...',
+      )),
+      ')',
+    ),
+
+    function_parameter: $ => choice(
+      // Named: a: int, a!: int, a?: int, _~x: int, a: int = 2, a: int @go(A).
+      // Dynamic precedence so "_" lexes as a label identifier rather than top.
+      prec.dynamic(1, seq(
+        field('label', choice($.identifier, $.keyword_identifier, '_')),
+        optional(field('alias', $.postfix_alias)),
+        optional(field('constraint', choice('?', '!'))),
+        ':',
+        field('value', $.expression),
+        optional(seq('=', field('default', $.expression))),
+        optional($.attribute),
+      )),
+      // Positional: int, string | int, ...
+      seq(
+        field('value', $.expression),
+        optional(seq('=', field('default', $.expression))),
+        optional($.attribute),
+      ),
+    ),
+
     expression: $ => prec.left(choice(
       $.primary_expression,
       $.unary_expression,
@@ -385,6 +430,9 @@ module.exports = grammar({
     )),
 
     primary_expression: $ => choice(
+      $.function_expression,
+      $.keyword_identifier,
+      $.builtin_function,
       $.parenthesized_expression,
       $.selector_expression,
       $.index_expression,
@@ -394,9 +442,12 @@ module.exports = grammar({
       $.literal,
     ),
 
+    // Postfix "..." (spread, explicitopen) must directly follow the expression:
+    // CUE inserts an automatic comma at a newline, so a "..." on the next line
+    // is a standalone ellipsis declaration instead ("{x: 1\n...}").
     postfix_expression: $ => prec(PREC.call, seq(
       $.primary_expression,
-      '?',
+      choice('?', token.immediate(prec(1, '...'))),
     )),
 
     binary_expression: $ => {
@@ -456,7 +507,13 @@ module.exports = grammar({
 
     arguments: $ => seq(
       '(',
-      commaSep(optional($.expression)),
+      optionalCommaSep(choice(
+        '...',
+        seq(
+          optional(seq(field('label', choice($.identifier, $.keyword_identifier)), ':')),
+          $.expression,
+        ),
+      )),
       ')',
     ),
 

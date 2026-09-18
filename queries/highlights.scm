@@ -40,6 +40,7 @@
 [
   "let"
   "try"
+  "func"
 ] @keyword
 
 [
@@ -68,6 +69,7 @@
   "!"
   "="
   "~"
+  "->"
 ] @operator
 
 ; Fields & Properties
@@ -96,6 +98,12 @@
 ; Variables
 
 (identifier) @variable
+
+; self refers to the enclosing struct (a token inside the inlined
+; keyword_identifier rule, so match it by text on the aliased identifier)
+
+((identifier) @keyword
+  (#eq? @keyword "self"))
 
 ; Types
 
@@ -126,6 +134,9 @@
 
 [
   (ellipsis)
+  (postfix_expression "...")
+  (arguments "...")
+  (parameter_list "...")
   "?"
   "!"
 ] @punctuation.special

@@ -1,0 +1,196 @@
+================================================================================
+function literal
+================================================================================
+
+sum: func(a: int, b: int) -> int: a + b
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (function_expression
+        (parameter_list
+          (function_parameter
+            (identifier)
+            (primitive_type))
+          (function_parameter
+            (identifier)
+            (primitive_type)))
+        (primitive_type)
+        (binary_expression
+          (identifier)
+          (identifier))))))
+
+================================================================================
+function type
+================================================================================
+
+sig: func(string, ...) -> string
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (function_expression
+        (parameter_list
+          (function_parameter
+            (primitive_type)))
+        (primitive_type)))))
+
+================================================================================
+required and optional parameters
+================================================================================
+
+req: func(a!: int, b?: int) -> int: a
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (function_expression
+        (parameter_list
+          (function_parameter
+            (identifier)
+            (primitive_type))
+          (function_parameter
+            (identifier)
+            (primitive_type)))
+        (primitive_type)
+        (identifier)))))
+
+================================================================================
+parameter with default and attribute
+================================================================================
+
+f: func(s: string, count: int = 2 @go(Count)) -> string
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (function_expression
+        (parameter_list
+          (function_parameter
+            (identifier)
+            (primitive_type))
+          (function_parameter
+            (identifier)
+            (primitive_type)
+            (number)
+            (attribute
+              (identifier)
+              (identifier))))
+        (primitive_type)))))
+
+================================================================================
+parameter with postfix alias
+================================================================================
+
+add1: func(_~x: int) -> int: x + 1
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (function_expression
+        (parameter_list
+          (function_parameter
+            (postfix_alias
+              (identifier))
+            (primitive_type)))
+        (primitive_type)
+        (binary_expression
+          (identifier)
+          (number))))))
+
+================================================================================
+labeled arguments
+================================================================================
+
+labeled: sum(a: 1, b: 2)
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (call_expression
+        (identifier)
+        (arguments
+          (identifier)
+          (number)
+          (identifier)
+          (number))))))
+
+================================================================================
+partial application
+================================================================================
+
+partial: sum(1, ...)
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (call_expression
+        (identifier)
+        (arguments
+          (number))))))
+
+================================================================================
+self
+================================================================================
+
+a: self.b
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (selector_expression
+        (identifier)
+        (identifier)))))
+
+================================================================================
+function keyword as label
+================================================================================
+
+func: 3
+self: 4
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (number)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))))
