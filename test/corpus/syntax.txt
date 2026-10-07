@@ -1,0 +1,293 @@
+===============
+spread operator
+===============
+
+b: #A...
+c: {x: 1}...
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (identifier)))
+  (ellipsis)
+  (field
+    (label
+      (identifier))
+    (value
+      (struct_lit
+        (field
+          (label
+            (identifier))
+          (value
+            (number))))))
+  (ellipsis))
+
+====================================
+ellipsis on its own line in a struct
+====================================
+
+a: {
+	b: 1
+	...
+}
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (struct_lit
+        (field
+          (label
+            (identifier))
+          (value
+            (number)))
+        (ellipsis)))))
+
+=====================
+closed struct literal
+=====================
+
+a: #{b: 1}
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (identifier)))
+  (struct_lit
+    (field
+      (label
+        (identifier))
+      (value
+        (number)))))
+
+================
+otherwise clause
+================
+
+for x in [] {
+	"\(x)": x
+} otherwise {
+	empty: true
+}
+
+---
+
+(source_file
+  (comprehension
+    (for_clause
+      (identifier)
+      (list_lit))
+    (struct_lit
+      (field
+        (label
+          (string
+            (interpolation
+              (identifier))))
+        (value
+          (identifier)))))
+  (identifier)
+  (struct_lit
+    (field
+      (label
+        (identifier))
+      (value
+        (boolean)))))
+
+===============
+fallback clause
+===============
+
+for x in [] {
+	"\(x)": x
+} fallback {
+	empty: true
+}
+
+---
+
+(source_file
+  (comprehension
+    (for_clause
+      (identifier)
+      (list_lit))
+    (struct_lit
+      (field
+        (label
+          (string
+            (interpolation
+              (identifier))))
+        (value
+          (identifier)))))
+  (identifier)
+  (struct_lit
+    (field
+      (label
+        (identifier))
+      (value
+        (boolean)))))
+
+=============
+function type
+=============
+
+f: func(int, string) -> int
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (binary_expression
+        (call_expression
+          (identifier)
+          (arguments
+            (primitive_type)
+            (primitive_type)))
+        (unary_expression
+          (primitive_type))))))
+
+====================================
+attribute between package and import
+====================================
+
+package p
+
+@experiment(try)
+
+import "strings"
+
+a: strings.ToUpper("x")
+
+---
+
+(source_file
+  (package_clause
+    (package_identifier))
+  (attribute
+    (identifier)
+    (identifier))
+  (identifier)
+  (string)
+  (field
+    (label
+      (identifier))
+    (value
+      (call_expression
+        (selector_expression
+          (identifier)
+          (identifier))
+        (arguments
+          (string))))))
+
+====================
+two field attributes
+====================
+
+a: 1 @foo(x) @bar(y)
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)))
+  (attribute
+    (identifier)
+    (identifier)))
+
+===================
+closed list literal
+:error
+===================
+
+a: #[1, 2]
+
+---
+
+
+
+====================
+alias in parentheses
+:error
+====================
+
+a~(X): {b: 1}
+
+---
+
+
+
+==========================
+alias then optional marker
+:error
+==========================
+
+a~(X)?: int
+
+---
+
+
+
+==========================
+raw string with two hashes
+:error
+==========================
+
+a: ##"foo"#bar"##
+
+---
+
+
+
+==============
+unary equality
+:error
+==============
+
+a: ==5
+
+---
+
+
+
+===========================
+index with a trailing comma
+:error
+===========================
+
+a: l[0,]
+
+---
+
+
+
+==============================
+null, true and false as labels
+:error
+==============================
+
+x: {
+	null: 1
+	true: 2
+	false: 3
+}
+
+---

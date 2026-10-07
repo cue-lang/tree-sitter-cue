@@ -29,7 +29,7 @@
   "repository": "https://github.com/eonpatapon/tree-sitter-cue",
   "scripts": {
     "build": "tree-sitter generate && node-gyp build",
-    "test": "tree-sitter test && script/parse-examples",
+    "test": "tree-sitter test && script/parse-syntax-corpus && script/parse-examples",
     "parse": "tree-sitter parse",
     "test-windows": "tree-sitter test",
     "lint": "eslint grammar.js"

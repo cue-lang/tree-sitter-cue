@@ -25,7 +25,7 @@ function clone_repo {
 	popd >/dev/null
 }
 
-clone_repo cue-lang cue d267795de4d3d6e93f49ecd87e38440c9452d5e6
+clone_repo cue-lang cue 7fb7792580ac4aabed124138a9bf7760c314b82b
 
 find $SCRIPT_DIR/examples -type f -name '*.cue' \
     | grep -vFf $SCRIPT_DIR/known_failures.txt \

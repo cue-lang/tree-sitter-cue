@@ -29,11 +29,17 @@ tree-sitter test
 ## Testing
 
 ```sh
-# Run all tests (corpus tests + parse real CUE files)
+# Run all tests (corpus tests, the CUE syntax corpus, real CUE files)
 npm test
 
 # Run only tree-sitter corpus tests
 tree-sitter test
+
+# Parse the copy of the CUE syntax corpus in test/syntax
+script/parse-syntax-corpus
+
+# Remove the files that now parse from test/syntax/KNOWN_GAPS
+script/parse-syntax-corpus --update
 
 # Parse example CUE files from cue-lang/cue
 script/parse-examples
@@ -41,6 +47,17 @@ script/parse-examples
 # Lint grammar.js
 npm run lint
 ```
+
+`test/syntax` is a copy of the syntax corpus that cue-lang/cue keeps at
+`cue/parser/testdata/syntax`: one file per syntax shape, in `pass/` (valid),
+`preview/` (valid with a preview experiment) or `fail/` (rejected).
+`script/parse-syntax-corpus` fails if a valid file has an ERROR or MISSING
+node, unless `test/syntax/KNOWN_GAPS` lists it, and if a listed file parses
+cleanly; a missing `KNOWN_GAPS` lists no file. With `--update`, the script
+removes the listed files that parse cleanly instead, and deletes
+`KNOWN_GAPS` once it lists none. `test/syntax/SOURCE` records where the
+copy came from; `script/sync-syntax-corpus <cue-checkout>` refreshes it
+from a cue-lang/cue checkout at a tag.
 
 ## Editor Setup
 

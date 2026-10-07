@@ -1,0 +1,45 @@
+# Corpus files that must be valid but that the grammar does not yet parse
+# without errors. script/parse-syntax-corpus fails if a listed file parses
+# cleanly; with --update, it removes such files, and deletes this file once
+# it lists none.
+pass/alias_postfix_dynamic.cue
+pass/alias_postfix_optional.cue
+pass/alias_postfix_paren.cue
+pass/attr_angle_and_star.cue
+pass/attr_bracket_values.cue
+pass/attr_nested_parens.cue
+pass/blank_identifier.cue
+pass/builtin_refs.cue
+pass/float_then_unit_label.cue
+pass/index_trailing_comma.cue
+pass/keyword_calls.cue
+pass/keyword_ref_then_field.cue
+pass/keyword_refs_clause_words.cue
+pass/keyword_refs_line_end.cue
+pass/keyword_refs_value.cue
+pass/keywords_as_labels.cue
+pass/label_dynamic_after_reference.cue
+pass/label_raw_string.cue
+pass/literal_selectors.cue
+pass/multi_hash_string.cue
+pass/multiline_interp_quotes.cue
+pass/multiline_quote_runs.cue
+pass/postfix_ellipsis_int.cue
+pass/postfix_ellipsis_signed.cue
+pass/raw_string_quote.cue
+pass/unary_eq.cue
+preview/call_chained.cue
+preview/call_labeled.cue
+preview/call_partial.cue
+preview/closed_list.cue
+preview/func_body_no_return.cue
+preview/func_body_postfix.cue
+preview/func_defaults.cue
+preview/func_keyword_params.cue
+preview/func_literal.cue
+preview/func_multiline.cue
+preview/func_name_then_dynamic_label.cue
+preview/func_open_signature.cue
+preview/func_param_attrs.cue
+preview/func_param_markers.cue
+preview/func_validator.cue

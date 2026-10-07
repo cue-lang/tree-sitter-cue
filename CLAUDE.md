@@ -38,15 +38,23 @@ npm run lint           # lint grammar.js
 ## Testing
 
 - `tree-sitter test` — runs corpus tests from `test/corpus/`
+- `script/parse-syntax-corpus` — parses the copy of the CUE syntax corpus in `test/syntax/`; files in its `pass/`
+  and `preview/` directories must parse without ERROR or MISSING nodes unless `test/syntax/KNOWN_GAPS` lists them,
+  and a listed file that parses fails the run; a missing `test/syntax/KNOWN_GAPS` lists no file
+- `script/parse-syntax-corpus --update` — removes the listed files that parse from `test/syntax/KNOWN_GAPS`, and
+  deletes it once it lists none; it never adds a file
+- `script/sync-syntax-corpus <cue-checkout>` — refreshes `test/syntax/` from a cue-lang/cue checkout at a tag,
+  recording the tag in `test/syntax/SOURCE`
 - `script/parse-examples` — clones cue-lang/cue and parses example `.cue` files (requires `bc`)
-- `npm test` — runs both of the above
+- `npm test` — runs `tree-sitter test`, `script/parse-syntax-corpus` and `script/parse-examples`
 - `npm run lint` — runs ESLint on `grammar.js`
 
 ## CI
 
 Three GitHub Actions workflows:
 
-- `ci.yml` — runs `npm test` (corpus tests + parse-examples) on macOS and Ubuntu; runs only `tree-sitter test` on Windows
+- `ci.yml` — runs `npm test` (corpus tests, the syntax corpus and parse-examples) on macOS and Ubuntu; runs only
+  `tree-sitter test` on Windows
 - `lint.yml` — runs ESLint
 - `fuzz.yml` — fuzzes the external scanner (`src/scanner.c`)
 
