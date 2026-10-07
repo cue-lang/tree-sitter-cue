@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# Refreshes the copy of the CUE syntax corpus in test/syntax from a checkout
+# of cue-lang/cue, which must be exactly at a tag, and records the tag in
+# test/syntax/SOURCE. The corpus is the pass, preview and fail directories;
+# corpus files that the checkout no longer has are removed. Run
+# script/parse-syntax-corpus afterwards.
+#
+# Usage: script/sync-syntax-corpus <cue-checkout>
+
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+	echo "usage: $0 <cue-checkout>" >&2
+	exit 2
+fi
+checkout=$1
+
+if ! tag=$(git -C "$checkout" describe --exact-match --tags 2>/dev/null); then
+	echo "$checkout is not a git checkout exactly at a tag" >&2
+	exit 1
+fi
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+CORPUS=$(dirname "$SCRIPT_DIR")/test/syntax
+src=$checkout/cue/parser/testdata/syntax
+
+shopt -s nullglob
+dirs=(pass preview fail)
+for dir in "${dirs[@]}"; do
+	files=("$src/$dir"/*.cue)
+	if [ ${#files[@]} -eq 0 ]; then
+		echo "no corpus files in $src/$dir" >&2
+		exit 1
+	fi
+done
+
+count=0
+for dir in "${dirs[@]}"; do
+	mkdir -p "$CORPUS/$dir"
+	for old in "$CORPUS/$dir"/*.cue; do
+		if [ ! -f "$src/$dir/$(basename "$old")" ]; then
+			rm "$old"
+		fi
+	done
+	files=("$src/$dir"/*.cue)
+	cp "${files[@]}" "$CORPUS/$dir"/
+	count=$((count + ${#files[@]}))
+done
+echo "cue-lang/cue $tag" >"$CORPUS/SOURCE"
+echo "copied $count corpus files from cue-lang/cue $tag"

@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# Parses the copy of the CUE syntax corpus in test/syntax. Each file that
+# must be valid fails the run if its tree has an ERROR or MISSING node,
+# unless test/syntax/KNOWN_GAPS lists it; a listed file that parses cleanly
+# also fails the run, so the list cannot go stale. Files that must be valid
+# are those in pass/ and preview/, and the fail/prefix_alias_* files, whose
+# syntax is still valid at language versions before v0.18.0. KNOWN_GAPS names
+# files by their path in test/syntax, as in pass/alias_postfix_paren.cue; a
+# missing KNOWN_GAPS lists no file.
+#
+# With --update, the script removes the listed files that parse cleanly from
+# KNOWN_GAPS instead of failing, and deletes KNOWN_GAPS once it lists no
+# file. It never adds a file: a valid file with errors still fails the run,
+# until the grammar is fixed or the file is listed by hand.
+
+set -euo pipefail
+
+update=false
+case "${1:-}" in
+--update) update=true ;;
+"") ;;
+*)
+	echo "usage: $0 [--update]" >&2
+	exit 2
+	;;
+esac
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT=$(dirname "$SCRIPT_DIR")
+CORPUS=$ROOT/test/syntax
+GAPS=$CORPUS/KNOWN_GAPS
+
+gaps=""
+if [ -f "$GAPS" ]; then
+	gaps=$(grep -v '^#' "$GAPS" | grep -v '^[[:space:]]*$' || true)
+fi
+
+status=0
+for name in $gaps; do
+	if [ ! -f "$CORPUS/$name" ]; then
+		echo "KNOWN_GAPS names $name, which is not a corpus file"
+		status=1
+	fi
+done
+
+cd "$ROOT"
+parsed=()
+for file in "$CORPUS"/pass/*.cue "$CORPUS"/preview/*.cue "$CORPUS"/fail/prefix_alias_*.cue; do
+	name=${file#"$CORPUS"/}
+	listed=false
+	if grep -qxF "$name" <<<"$gaps"; then
+		listed=true
+	fi
+	if tree-sitter parse -q "$file" >/dev/null 2>&1; then
+		if $listed; then
+			if $update; then
+				parsed+=("$name")
+			else
+				echo "$name: parses without errors; run script/parse-syntax-corpus --update to remove it from KNOWN_GAPS"
+				status=1
+			fi
+		fi
+	elif ! $listed; then
+		echo "$name: parse errors; fix the grammar, or list the file in test/syntax/KNOWN_GAPS"
+		tree-sitter parse -q "$file" 2>/dev/null || true
+		status=1
+	fi
+done
+
+if $update && [ -f "$GAPS" ]; then
+	remaining=$(grep -vxF -f <(printf '%s\n' "${parsed[@]}") "$GAPS" || true)
+	for name in "${parsed[@]}"; do
+		echo "$name: parses without errors; removed from KNOWN_GAPS"
+	done
+	if grep -v '^#' <<<"$remaining" | grep -q '[^[:space:]]'; then
+		printf '%s\n' "$remaining" >"$GAPS"
+	else
+		rm "$GAPS"
+		echo "KNOWN_GAPS lists no file; removed it"
+	fi
+fi
+
+exit $status
