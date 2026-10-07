@@ -2,9 +2,6 @@
 # without errors. script/parse-syntax-corpus fails if a listed file parses
 # cleanly; with --update, it removes such files, and deletes this file once
 # it lists none.
-pass/alias_postfix_dynamic.cue
-pass/alias_postfix_optional.cue
-pass/alias_postfix_paren.cue
 pass/attr_angle_and_star.cue
 pass/attr_bracket_values.cue
 pass/attr_nested_parens.cue
