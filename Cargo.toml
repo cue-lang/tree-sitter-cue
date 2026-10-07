@@ -1,7 +1,7 @@
 [package]
 name = "tree-sitter-cue"
 description = "Cue grammar for tree-sitter"
-version = "0.0.1"
+version = "0.2.0"
 authors = [
 	"Jean-Philippe Braun <eon@patapon.info>",
 	"Amaan Qureshi <amaanq12@gmail.com>",
