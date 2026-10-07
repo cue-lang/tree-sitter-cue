@@ -97,6 +97,13 @@
 
 (identifier) @variable
 
+((identifier) @variable.builtin
+  (#any-of? @variable.builtin "self" "__self"))
+
+(call_expression
+  function: (identifier) @function.builtin
+  (#eq? @function.builtin "validator"))
+
 ; Types
 
 (primitive_type) @type.builtin
@@ -129,6 +136,8 @@
   "?"
   "!"
 ] @punctuation.special
+
+(spread_expression "..." @operator)
 
 ; Literals
 
