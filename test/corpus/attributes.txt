@@ -114,7 +114,7 @@ myStruct2: {
               (attribute
                 (identifier)
                 (identifier)
-                (identifier)))
-            (attribute
-              (identifier)
-              (identifier))))))
+                (identifier))
+              (attribute
+                (identifier)
+                (identifier)))))))

@@ -8,16 +8,13 @@ pass/attr_nested_parens.cue
 pass/blank_identifier.cue
 pass/builtin_refs.cue
 pass/float_then_unit_label.cue
-pass/index_trailing_comma.cue
 pass/keyword_calls.cue
 pass/keyword_ref_then_field.cue
 pass/keyword_refs_clause_words.cue
 pass/keyword_refs_line_end.cue
 pass/keyword_refs_value.cue
-pass/keywords_as_labels.cue
 pass/label_dynamic_after_reference.cue
 pass/label_raw_string.cue
-pass/literal_selectors.cue
 pass/multi_hash_string.cue
 pass/multiline_interp_quotes.cue
 pass/multiline_quote_runs.cue

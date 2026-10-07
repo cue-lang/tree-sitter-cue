@@ -701,6 +701,11 @@
     }
   },
   {
+    "type": "null",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "optional",
     "named": true,
     "fields": {
@@ -1616,7 +1621,7 @@
   },
   {
     "type": "null",
-    "named": true
+    "named": false
   },
   {
     "type": "number",
