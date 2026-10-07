@@ -393,6 +393,7 @@ module.exports = grammar({
       $.index_expression,
       $.call_expression,
       $.postfix_expression,
+      $.spread_expression,
       $.identifier,
       $.literal,
     ),
@@ -400,6 +401,14 @@ module.exports = grammar({
     postfix_expression: $ => prec(PREC.call, seq(
       $.primary_expression,
       '?',
+    )),
+
+    // The spread operator, as in #A...: the ellipsis directly follows its
+    // operand. An ellipsis after whitespace, such as one on its own line in
+    // a struct, is a separate declaration.
+    spread_expression: $ => prec(PREC.call, seq(
+      $.primary_expression,
+      token.immediate('...'),
     )),
 
     binary_expression: $ => {
@@ -425,7 +434,7 @@ module.exports = grammar({
     },
 
     unary_expression: $ => {
-      const unary_operators = ['+', '-', '!', '*', '!=', '<', '<=', '>', '>=', '=~', '!~'];
+      const unary_operators = ['+', '-', '!', '*', '==', '!=', '<', '<=', '>', '>=', '=~', '!~'];
 
       return choice(...unary_operators.map((operator) => prec(PREC.unary, seq(
         field('operator', operator),
