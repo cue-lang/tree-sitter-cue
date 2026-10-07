@@ -12,19 +12,19 @@ c: {x: 1}...
     (label
       (identifier))
     (value
-      (identifier)))
-  (ellipsis)
+      (spread_expression
+        (identifier))))
   (field
     (label
       (identifier))
     (value
-      (struct_lit
-        (field
-          (label
-            (identifier))
-          (value
-            (number))))))
-  (ellipsis))
+      (spread_expression
+        (struct_lit
+          (field
+            (label
+              (identifier))
+            (value
+              (number))))))))
 
 ====================================
 ellipsis on its own line in a struct
@@ -277,14 +277,19 @@ a: ##"foo"#bar"##
 
 ==============
 unary equality
-:error
 ==============
 
 a: ==5
 
 ---
 
-
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (unary_expression
+        (number)))))
 
 ===========================
 index with a trailing comma

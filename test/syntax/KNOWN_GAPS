@@ -24,7 +24,6 @@ pass/multiline_quote_runs.cue
 pass/postfix_ellipsis_int.cue
 pass/postfix_ellipsis_signed.cue
 pass/raw_string_quote.cue
-pass/unary_eq.cue
 preview/call_chained.cue
 preview/call_labeled.cue
 preview/call_partial.cue
