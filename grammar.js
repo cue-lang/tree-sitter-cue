@@ -311,15 +311,17 @@ module.exports = grammar({
 
     _label_alias_expr: $ => alias($._alias_expr, $.optional),
 
-    required: $ => seq($._label_name, '!'),
+    // A postfix alias comes before the optional or required marker, as in
+    // a~(X)?: int.
+    required: $ => seq($._label_name, optional($.postfix_alias), '!'),
 
-    optional: $ => seq($._label_name, '?'),
+    optional: $ => seq($._label_name, optional($.postfix_alias), '?'),
 
     _label_expr: $ => choice(
-      $._label_name,
+      seq($._label_name, optional($.postfix_alias)),
       $.optional,
       $.required,
-      seq('[', $._label_alias_expr, ']'),
+      seq('[', $._label_alias_expr, ']', optional($.postfix_alias)),
     ),
 
     label: $ => seq(
@@ -334,12 +336,13 @@ module.exports = grammar({
       '~',
       choice(
         field('field', $.identifier),
+        seq('(', field('field', $.identifier), ')'),
         seq('(', field('label', $.identifier), ',', field('field', $.identifier), ')'),
       ),
     ),
 
     field: $ => prec.right(seq(
-      repeat1(seq($.label, optional($.postfix_alias), ':')),
+      repeat1(seq($.label, ':')),
       $._value,
       optional($.attribute),
     )),

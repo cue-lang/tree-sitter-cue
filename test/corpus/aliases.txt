@@ -75,8 +75,7 @@ myLabel~X: value
 
 (source_file
  (field
-  (label (identifier))
-  (postfix_alias field: (identifier))
+  (label (identifier) (postfix_alias field: (identifier)))
   (value (identifier))))
 
 ===
@@ -89,6 +88,5 @@ myLabel~(K, V): value
 
 (source_file
  (field
-  (label (identifier))
-  (postfix_alias label: (identifier) field: (identifier))
+  (label (identifier) (postfix_alias label: (identifier) field: (identifier)))
   (value (identifier))))

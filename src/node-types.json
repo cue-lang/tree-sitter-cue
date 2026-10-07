@@ -431,10 +431,6 @@
           "named": true
         },
         {
-          "type": "postfix_alias",
-          "named": true
-        },
-        {
           "type": "value",
           "named": true
         }
@@ -606,7 +602,7 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
@@ -619,6 +615,10 @@
         },
         {
           "type": "optional",
+          "named": true
+        },
+        {
+          "type": "postfix_alias",
           "named": true
         },
         {
@@ -712,7 +712,7 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
@@ -725,6 +725,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "postfix_alias",
           "named": true
         },
         {
@@ -912,7 +916,7 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
@@ -921,6 +925,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "postfix_alias",
           "named": true
         },
         {

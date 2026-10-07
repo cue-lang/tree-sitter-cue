@@ -226,25 +226,43 @@ a: #[1, 2]
 
 ====================
 alias in parentheses
-:error
 ====================
 
 a~(X): {b: 1}
 
 ---
 
-
+(source_file
+  (field
+    (label
+      (identifier)
+      (postfix_alias
+        (identifier)))
+    (value
+      (struct_lit
+        (field
+          (label
+            (identifier))
+          (value
+            (number)))))))
 
 ==========================
 alias then optional marker
-:error
 ==========================
 
 a~(X)?: int
 
 ---
 
-
+(source_file
+  (field
+    (label
+      (optional
+        (identifier)
+        (postfix_alias
+          (identifier))))
+    (value
+      (primitive_type))))
 
 ==========================
 raw string with two hashes
