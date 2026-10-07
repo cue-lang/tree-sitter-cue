@@ -9,7 +9,7 @@ way.)
 ```toml
 [dependencies]
 tree-sitter = "~0.20.3"
-tree-sitter-cue = "0.0.1"
+tree-sitter-cue = "0.2.0"
 ```
 
 Typically, you will use the [language][language func] function to add this
