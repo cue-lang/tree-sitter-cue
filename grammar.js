@@ -130,6 +130,13 @@ module.exports = grammar({
     $._raw_bytes_content,
     $._multi_raw_str_content,
     $._multi_raw_bytes_content,
+    $._raw_str_start,
+    $._raw_bytes_start,
+    $._multi_raw_str_start,
+    $._multi_raw_bytes_start,
+    $._raw_end,
+    $._raw_interpolation_start,
+    $._error_sentinel,
   ],
 
   inline: $ => [
@@ -606,6 +613,10 @@ module.exports = grammar({
       ),
     ),
 
+    // In a multiline literal, a backslash at the end of a line escapes the
+    // newline.
+    _escape_newline: _ => token.immediate(seq('\\', repeat('#'), /\r?\n/)),
+
     string: $ => choice(
       $._simple_string_lit,
       $._simple_bytes_lit,
@@ -644,6 +655,7 @@ module.exports = grammar({
         $._multi_str_content,
         $.interpolation,
         $._escape_unicode,
+        alias($._escape_newline, $.escape_char),
       )),
       token('"""'),
     ),
@@ -655,55 +667,60 @@ module.exports = grammar({
         $.interpolation,
         $.escape_byte,
         $._escape_unicode,
+        alias($._escape_newline, $.escape_char),
       )),
       token('\'\'\''),
     ),
 
+    // Raw literals take any number of '#'; the external scanner matches the
+    // delimiters, which keep the names of their one-'#' forms.
     _simple_raw_string_lit: $ => seq(
-      '#"',
+      alias($._raw_str_start, '#"'),
       repeat(choice(
         $._raw_str_content,
         $.raw_interpolation,
         $._escape_unicode,
       )),
-      '"#',
+      alias($._raw_end, '"#'),
     ),
 
     _simple_raw_bytes_lit: $ => seq(
-      '#\'',
+      alias($._raw_bytes_start, '#\''),
       repeat(choice(
         $._raw_bytes_content,
         $.raw_interpolation,
         $.escape_byte,
         $._escape_unicode,
       )),
-      '\'#',
+      alias($._raw_end, '\'#'),
     ),
 
     _multiline_raw_string_lit: $ => seq(
-      token('#"""'),
+      alias($._multi_raw_str_start, '#"""'),
       repeat(choice(
         $._multi_raw_str_content,
         $.raw_interpolation,
         $._escape_unicode,
+        alias($._escape_newline, $.escape_char),
       )),
-      token('"""#'),
+      alias($._raw_end, '"""#'),
     ),
 
     _multiline_raw_bytes_lit: $ => seq(
-      token('#\'\'\''),
+      alias($._multi_raw_bytes_start, '#\'\'\''),
       repeat(choice(
         $._multi_raw_bytes_content,
         $.raw_interpolation,
         $.escape_byte,
         $._escape_unicode,
+        alias($._escape_newline, $.escape_char),
       )),
-      token('\'\'\'#'),
+      alias($._raw_end, '\'\'\'#'),
     ),
 
     interpolation: $ => seq('\\(', $.expression, ')'),
 
-    raw_interpolation: $ => seq('\\#(', $.expression, ')'),
+    raw_interpolation: $ => seq(alias($._raw_interpolation_start, '\\#('), $.expression, ')'),
 
     comment: _ => token(seq('//', /.*/)),
   },

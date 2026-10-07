@@ -267,14 +267,18 @@ a~(X)?: int
 
 ==========================
 raw string with two hashes
-:error
 ==========================
 
 a: ##"foo"#bar"##
 
 ---
 
-
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (string))))
 
 ==============
 unary equality
@@ -342,3 +346,127 @@ x: {
             (identifier))
           (value
             (number)))))))
+
+========================================
+raw string nested in a raw interpolation
+========================================
+
+a: #"x\#(##"y"## + "z")w"#
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (string
+        (raw_interpolation
+          (binary_expression
+            (string)
+            (string)))))))
+
+=====================================
+raw escapes take the number of hashes
+=====================================
+
+a: ##"\##n and \#n"##
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (string
+        (escape_char)))))
+
+=================================
+raw interpolation with two hashes
+=================================
+
+x: 1
+a: ##"v\##(x)"##
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (number)))
+  (field
+    (label
+      (identifier))
+    (value
+      (string
+        (raw_interpolation
+          (identifier))))))
+
+====================================
+multiline raw string with two hashes
+====================================
+
+a: ##"""
+	x"""#y
+	"""##
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (string))))
+
+=========================
+raw bytes with two hashes
+=========================
+
+a: ##'b'##
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (string))))
+
+================
+empty raw string
+================
+
+a: #""#
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (string))))
+
+=====================================
+escaped newline in a multiline string
+=====================================
+
+a: """
+	foo \
+	bar
+	"""
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (string
+        (escape_char)))))
