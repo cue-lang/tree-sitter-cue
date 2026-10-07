@@ -179,8 +179,9 @@ a: strings.ToUpper("x")
   (attribute
     (identifier)
     (identifier))
-  (identifier)
-  (string)
+  (import_declaration
+    (import_spec
+      (string)))
   (field
     (label
       (identifier))
@@ -208,10 +209,10 @@ a: 1 @foo(x) @bar(y)
       (number))
     (attribute
       (identifier)
-      (identifier)))
-  (attribute
-    (identifier)
-    (identifier)))
+      (identifier))
+    (attribute
+      (identifier)
+      (identifier))))
 
 ===================
 closed list literal
@@ -293,18 +294,23 @@ a: ==5
 
 ===========================
 index with a trailing comma
-:error
 ===========================
 
 a: l[0,]
 
 ---
 
-
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (index_expression
+        (identifier)
+        (number)))))
 
 ==============================
 null, true and false as labels
-:error
 ==============================
 
 x: {
@@ -314,3 +320,25 @@ x: {
 }
 
 ---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (struct_lit
+        (field
+          (label
+            (identifier))
+          (value
+            (number)))
+        (field
+          (label
+            (identifier))
+          (value
+            (number)))
+        (field
+          (label
+            (identifier))
+          (value
+            (number)))))))

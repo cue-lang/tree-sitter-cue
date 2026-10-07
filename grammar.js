@@ -153,7 +153,12 @@ module.exports = grammar({
   rules: {
     source_file: $ => prec(1, seq(
       optionalCommaSep($.attribute),
-      optional($.package_clause),
+      optional(seq(
+        $.package_clause,
+        // Attributes between the package clause and the imports are file
+        // attributes.
+        optionalCommaSep($.attribute),
+      )),
       optionalCommaSep($.import_declaration),
       optionalCommaSep($._declaration),
     )),
@@ -304,6 +309,7 @@ module.exports = grammar({
       prec(1, $.keyword_identifier),
       prec(1, alias($.primitive_type, $.identifier)),
       prec(1, alias($.builtin_function, $.identifier)),
+      prec(1, alias(choice('null', 'true', 'false'), $.identifier)),
       prec.dynamic(1, alias($._simple_string_lit, $.string)),
       prec.dynamic(1, $.selector_expression),
       prec.dynamic(1, alias($.parenthesized_expression, $.dynamic)),
@@ -344,7 +350,7 @@ module.exports = grammar({
     field: $ => prec.right(seq(
       repeat1(seq($.label, ':')),
       $._value,
-      optional($.attribute),
+      repeat($.attribute),
     )),
 
     _value: $ => alias($._alias_expr, $.value),
@@ -457,6 +463,7 @@ module.exports = grammar({
       $.primary_expression,
       token.immediate('['),
       field('index', $.expression),
+      optional(','),
       ']',
     ),
 
