@@ -15,7 +15,6 @@ pass/keyword_refs_line_end.cue
 pass/keyword_refs_value.cue
 pass/label_dynamic_after_reference.cue
 pass/label_raw_string.cue
-pass/multi_hash_string.cue
 pass/multiline_interp_quotes.cue
 pass/multiline_quote_runs.cue
 pass/postfix_ellipsis_int.cue
