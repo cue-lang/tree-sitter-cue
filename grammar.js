@@ -506,7 +506,10 @@ module.exports = grammar({
     // rather than called.
     _builtin_reference: $ => alias($.builtin_function, $.identifier),
 
-    parenthesized_expression: $ => seq('(', $.expression, ')'),
+    // A parenthesized expression may start with the '(' that directly
+    // follows a word, as in if(x) {...}, where the guard of a comprehension
+    // and a call of a reference to if both begin; the clause wins.
+    parenthesized_expression: $ => seq(choice('(', token.immediate('(')), $.expression, ')'),
 
     // A function literal, as in func(a: int) -> int: a + 1, or a function
     // type, as in func(int) -> int.
@@ -554,17 +557,13 @@ module.exports = grammar({
       repeat($.attribute),
     ),
 
+    // A call applies to any operand, as in f(1), int(1) and [1](0),
+    // including a keyword used as a reference, as in otherwise(1). func(
+    // starts a function literal instead.
     call_expression: $ => prec(PREC.call, seq(
       field('function', choice(
         $.builtin_function,
-        $.selector_expression,
-        $.identifier,
-        // A keyword called as a function, as in otherwise(1). func( starts
-        // a function literal instead.
-        alias(choice('otherwise', 'fallback', 'try', 'else'), $.identifier),
-        $.parenthesized_expression,
-        $.call_expression,
-        $.index_expression,
+        $.primary_expression,
       )),
       $.arguments,
     )),
