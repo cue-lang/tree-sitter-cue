@@ -2122,6 +2122,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "_builtin_reference"
+        },
+        {
+          "type": "SYMBOL",
           "name": "parenthesized_expression"
         },
         {
@@ -3026,6 +3030,15 @@
           "value": "identifier"
         }
       }
+    },
+    "_builtin_reference": {
+      "type": "ALIAS",
+      "content": {
+        "type": "SYMBOL",
+        "name": "builtin_function"
+      },
+      "named": true,
+      "value": "identifier"
     },
     "parenthesized_expression": {
       "type": "SEQ",

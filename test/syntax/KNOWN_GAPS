@@ -6,7 +6,6 @@ pass/attr_angle_and_star.cue
 pass/attr_bracket_values.cue
 pass/attr_nested_parens.cue
 pass/blank_identifier.cue
-pass/builtin_refs.cue
 pass/keyword_ref_then_field.cue
 pass/keyword_refs_clause_words.cue
 pass/keyword_refs_line_end.cue
