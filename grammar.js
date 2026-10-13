@@ -538,6 +538,8 @@ module.exports = grammar({
         // a function literal instead.
         alias(choice('otherwise', 'fallback', 'try', 'else'), $.identifier),
         $.parenthesized_expression,
+        $.call_expression,
+        $.index_expression,
       )),
       $.arguments,
     )),
@@ -559,8 +561,11 @@ module.exports = grammar({
     )),
 
     // A trailing ellipsis applies a function partially, as in f(1, ...).
+    // The arguments directly follow the function, as cue fmt writes them,
+    // so that a dynamic label such as (k) on the next line is not taken as
+    // a call.
     arguments: $ => seq(
-      '(',
+      token.immediate('('),
       commaSep(optional(choice($.expression, $.labeled_argument, $.ellipsis))),
       ')',
     ),
