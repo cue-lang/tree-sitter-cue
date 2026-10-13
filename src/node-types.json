@@ -1351,6 +1351,10 @@
     "named": false
   },
   {
+    "type": "#",
+    "named": false
+  },
+  {
     "type": "#\"",
     "named": false
   },
@@ -1540,6 +1544,10 @@
     "named": true
   },
   {
+    "type": "fallback",
+    "named": false
+  },
+  {
     "type": "false",
     "named": false
   },
@@ -1633,6 +1641,10 @@
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "otherwise",
     "named": false
   },
   {

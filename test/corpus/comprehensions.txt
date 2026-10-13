@@ -169,3 +169,118 @@ x: {
      (for_clause (identifier) (list_lit))
      (struct_lit))
     (field (label (identifier)) (value (number)))))))
+
+===
+fields named otherwise and fallback after comprehensions
+===
+
+x: {
+	for a in [] {}
+	otherwise: 1
+	for b in [] {}
+	fallback: 2
+}
+
+---
+
+(source_file
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (for_clause (identifier) (list_lit))
+     (struct_lit))
+    (field (label (identifier)) (value (number)))
+    (comprehension
+     (for_clause (identifier) (list_lit))
+     (struct_lit))
+    (field (label (identifier)) (value (number)))))))
+
+===
+otherwise and fallback as references
+===
+
+otherwise: 1
+fallback:  2
+x: otherwise
+y: fallback + 1
+z: {
+	for a in [] {}
+	otherwise
+}
+
+---
+
+(source_file
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (identifier)))
+ (field (label (identifier)) (value (binary_expression (identifier) (number))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (for_clause (identifier) (list_lit))
+     (struct_lit))
+    (identifier)))))
+
+===
+otherwise and fallback called as functions
+===
+
+a: otherwise(1)
+b: fallback(1, 2)
+
+---
+
+(source_file
+ (field
+  (label (identifier))
+  (value (call_expression (identifier) (arguments (number)))))
+ (field
+  (label (identifier))
+  (value (call_expression (identifier) (arguments (number) (number))))))
+
+===
+clauses followed by a declaration
+===
+
+for v in [] {a: v} otherwise {b: 1}
+c: 2
+x: {
+	if true {d: 3} else {e: 4}
+	f: 5
+}
+y: {
+	for v in [] {g: v} fallback {h: 6}
+	i: 7
+}
+
+---
+
+(source_file
+ (comprehension
+  (for_clause (identifier) (list_lit))
+  (struct_lit (field (label (identifier)) (value (identifier))))
+  (else_clause (struct_lit (field (label (identifier)) (value (number))))))
+ (field (label (identifier)) (value (number)))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (guard_clause (boolean))
+     (struct_lit (field (label (identifier)) (value (number))))
+     (else_clause (struct_lit (field (label (identifier)) (value (number))))))
+    (field (label (identifier)) (value (number))))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (for_clause (identifier) (list_lit))
+     (struct_lit (field (label (identifier)) (value (identifier))))
+     (else_clause (struct_lit (field (label (identifier)) (value (number))))))
+    (field (label (identifier)) (value (number)))))))

@@ -515,6 +515,14 @@
             },
             {
               "type": "STRING",
+              "value": "otherwise"
+            },
+            {
+              "type": "STRING",
+              "value": "fallback"
+            },
+            {
+              "type": "STRING",
               "value": "try"
             },
             {
@@ -1230,6 +1238,18 @@
       "type": "SEQ",
       "members": [
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_closed"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "STRING",
           "value": "["
         },
@@ -1249,6 +1269,18 @@
     "struct_lit": {
       "type": "SEQ",
       "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_closed"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
         {
           "type": "STRING",
           "value": "{"
@@ -1311,6 +1343,15 @@
           "value": "}"
         }
       ]
+    },
+    "_closed": {
+      "type": "ALIAS",
+      "content": {
+        "type": "SYMBOL",
+        "name": "_closed_hash"
+      },
+      "named": false,
+      "value": "#"
     },
     "ellipsis": {
       "type": "PREC_LEFT",
@@ -1978,8 +2019,21 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "else"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "else"
+            },
+            {
+              "type": "STRING",
+              "value": "otherwise"
+            },
+            {
+              "type": "STRING",
+              "value": "fallback"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -2045,6 +2099,10 @@
     "primary_expression": {
       "type": "CHOICE",
       "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_keyword_reference"
+        },
         {
           "type": "SYMBOL",
           "name": "parenthesized_expression"
@@ -2756,6 +2814,32 @@
         }
       ]
     },
+    "_keyword_reference": {
+      "type": "PREC",
+      "value": -3,
+      "content": {
+        "type": "PREC_DYNAMIC",
+        "value": -1,
+        "content": {
+          "type": "ALIAS",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "otherwise"
+              },
+              {
+                "type": "STRING",
+                "value": "fallback"
+              }
+            ]
+          },
+          "named": true,
+          "value": "identifier"
+        }
+      }
+    },
     "parenthesized_expression": {
       "type": "SEQ",
       "members": [
@@ -2796,6 +2880,24 @@
                 {
                   "type": "SYMBOL",
                   "name": "identifier"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "otherwise"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "fallback"
+                      }
+                    ]
+                  },
+                  "named": true,
+                  "value": "identifier"
                 }
               ]
             }
@@ -4441,6 +4543,10 @@
     ],
     [
       "comprehension"
+    ],
+    [
+      "_label_name",
+      "_keyword_reference"
     ]
   ],
   "precedences": [],
@@ -4492,6 +4598,10 @@
     {
       "type": "SYMBOL",
       "name": "_raw_interpolation_start"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_closed_hash"
     },
     {
       "type": "SYMBOL",

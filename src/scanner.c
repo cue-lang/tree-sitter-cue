@@ -17,6 +17,7 @@ enum TokenType {
   MULTI_RAW_BYTES_START,
   RAW_END,
   RAW_INTERPOLATION_START,
+  CLOSED_HASH,
   ERROR_SENTINEL,
 };
 
@@ -91,15 +92,17 @@ static bool scan_multiline(TSLexer *lexer, int c) {
   }
 }
 
-// scan_raw_start scans the opening delimiter of a raw string: one or more
-// '#', then a quote, or three quotes for a multiline literal. Unlike the
-// other tokens here, it can follow whitespace.
-static bool scan_raw_start(Scanner *s, TSLexer *lexer,
-                           const bool *valid_symbols) {
+// scan_hash_start scans a token starting with '#': the opening delimiter of
+// a raw string, which is one or more '#' then a quote, or three quotes for a
+// multiline literal; or a single '#' directly before '[' or '{', which opens
+// a closed list or struct. Unlike the other tokens here, it can follow
+// whitespace.
+static bool scan_hash_start(Scanner *s, TSLexer *lexer,
+                            const bool *valid_symbols) {
   while (iswspace(lexer->lookahead)) {
     skip(lexer);
   }
-  if (lexer->lookahead != '#' || s->depth == MAX_DEPTH) {
+  if (lexer->lookahead != '#') {
     return false;
   }
   unsigned hashes = 0;
@@ -107,7 +110,13 @@ static bool scan_raw_start(Scanner *s, TSLexer *lexer,
     advance(lexer);
     hashes++;
   }
-  if (hashes > UINT8_MAX) {
+  if (hashes == 1 && (lexer->lookahead == '[' || lexer->lookahead == '{') &&
+      valid_symbols[CLOSED_HASH]) {
+    lexer->mark_end(lexer);
+    lexer->result_symbol = CLOSED_HASH;
+    return true;
+  }
+  if (hashes > UINT8_MAX || s->depth == MAX_DEPTH) {
     return false;
   }
   char quote = (char)lexer->lookahead;
@@ -230,8 +239,8 @@ static bool scan(Scanner *s, TSLexer *lexer, const bool *valid_symbols) {
   }
   if (valid_symbols[RAW_STR_START] || valid_symbols[RAW_BYTES_START] ||
       valid_symbols[MULTI_RAW_STR_START] ||
-      valid_symbols[MULTI_RAW_BYTES_START]) {
-    return scan_raw_start(s, lexer, valid_symbols);
+      valid_symbols[MULTI_RAW_BYTES_START] || valid_symbols[CLOSED_HASH]) {
+    return scan_hash_start(s, lexer, valid_symbols);
   }
   return false;
 }
