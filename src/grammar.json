@@ -1483,6 +1483,19 @@
           "type": "PREC_DYNAMIC",
           "value": 1,
           "content": {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_simple_raw_string_lit"
+            },
+            "named": true,
+            "value": "string"
+          }
+        },
+        {
+          "type": "PREC_DYNAMIC",
+          "value": 1,
+          "content": {
             "type": "SYMBOL",
             "name": "selector_expression"
           }

@@ -866,3 +866,24 @@ a: ##1...
   (identifier)
   (spread_expression
     (number)))
+
+=====================
+raw strings as labels
+=====================
+
+#"a b"#: 1
+##"c"##: 2
+
+---
+
+(source_file
+  (field
+    (label
+      (string))
+    (value
+      (number)))
+  (field
+    (label
+      (string))
+    (value
+      (number))))
