@@ -3,7 +3,6 @@
 # cleanly; with --update, it removes such files, and deletes this file once
 # it lists none.
 pass/blank_identifier.cue
-pass/keyword_ref_then_field.cue
 pass/keyword_refs_clause_words.cue
 pass/keyword_refs_line_end.cue
 pass/multiline_interp_quotes.cue
