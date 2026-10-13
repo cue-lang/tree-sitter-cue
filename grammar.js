@@ -310,7 +310,10 @@ module.exports = grammar({
 
     // A '#' directly before the opening bracket or brace makes the list or
     // struct closed, as in #[1, 2] and #{a: 1}.
-    list_lit: $ => seq(optional($._closed), '[', repeat($._list_elem), ']'),
+    // A list may start with the '[' that directly follows a word, as in
+    // if[x][0] {...}, where the guard of a comprehension and an index on a
+    // reference to if both begin; the clause wins.
+    list_lit: $ => seq(optional($._closed), choice('[', token.immediate('[')), repeat($._list_elem), ']'),
 
     struct_lit: $ => seq(
       optional($._closed),
@@ -355,7 +358,7 @@ module.exports = grammar({
       seq($._label_name, optional($.postfix_alias)),
       $.optional,
       $.required,
-      seq('[', $._label_alias_expr, ']', optional($.postfix_alias)),
+      seq(choice('[', token.immediate('[')), $._label_alias_expr, ']', optional($.postfix_alias)),
     ),
 
     label: $ => seq(
@@ -490,12 +493,12 @@ module.exports = grammar({
       ))));
     },
 
-    // A keyword used as a reference, as in x: otherwise, outside the
-    // construct the keyword starts. Where the keyword can also start a
-    // clause, as otherwise and a struct after a comprehension, the parser
-    // prefers the clause.
+    // A keyword used as a reference, as in x: otherwise or x: if, outside
+    // the construct the keyword starts. Where the keyword can also start a
+    // clause, as otherwise and a struct after a comprehension, or if, for
+    // and let at the start of a declaration, the parser prefers the clause.
     _keyword_reference: $ => prec(-3, prec.dynamic(-1, alias(
-      choice('func', 'otherwise', 'fallback', 'try', 'else'),
+      choice('func', 'otherwise', 'fallback', 'try', 'else', 'if', 'for', 'let'),
       $.identifier,
     ))),
 

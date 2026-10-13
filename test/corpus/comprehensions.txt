@@ -307,6 +307,53 @@ z: {
  (field (label (identifier)) (value (struct_lit (identifier)))))
 
 ===
+if, for and let as references
+===
+
+if:  1
+for: 2
+let: 3
+x: if
+y: for
+z: let
+w: {
+	if
+}
+
+---
+
+(source_file
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (identifier)))
+ (field (label (identifier)) (value (identifier)))
+ (field (label (identifier)) (value (identifier)))
+ (field (label (identifier)) (value (struct_lit (identifier)))))
+
+===
+if with a list condition directly after it
+===
+
+x: true
+f: {if[x][0] {g: 1}}
+
+---
+
+(source_file
+ (field (label (identifier)) (value (boolean)))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (guard_clause
+      condition: (index_expression
+       (list_lit (identifier))
+       index: (number)))
+     (struct_lit (field (label (identifier)) (value (number)))))))))
+
+===
 try and else called as functions
 ===
 
