@@ -153,6 +153,7 @@ module.exports = grammar({
     [$._embedding, $._label_alias_expr],
     [$._label_name, $.primary_expression],
     [$._label_name, $.string],
+    [$.comprehension],
   ],
 
   word: $ => $.identifier,
@@ -380,12 +381,15 @@ module.exports = grammar({
       optional(seq(field('left', $.identifier), '=', field('right', $.expression))),
     ),
 
-    comprehension: $ => prec.right(seq(
+    // A word after the struct may start an else clause or, when CUE ends
+    // the comprehension at a newline, the label of the next field, so the
+    // parser keeps both readings until the next token decides.
+    comprehension: $ => seq(
       choice($.for_clause, $.guard_clause, $.try_clause),
       repeat(seq(optional(','), $._clause)),
       $.struct_lit,
       optional($.else_clause),
-    )),
+    ),
 
     else_clause: $ => seq('else', $.struct_lit),
 
