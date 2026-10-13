@@ -2954,8 +2954,20 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "("
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "("
+            },
+            {
+              "type": "IMMEDIATE_TOKEN",
+              "content": {
+                "type": "STRING",
+                "value": "("
+              }
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -3295,49 +3307,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "selector_expression"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "identifier"
-                },
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "STRING",
-                        "value": "otherwise"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": "fallback"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": "try"
-                      },
-                      {
-                        "type": "STRING",
-                        "value": "else"
-                      }
-                    ]
-                  },
-                  "named": true,
-                  "value": "identifier"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "parenthesized_expression"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "call_expression"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "index_expression"
+                  "name": "primary_expression"
                 }
               ]
             }
