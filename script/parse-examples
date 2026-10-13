@@ -27,6 +27,22 @@ function clone_repo {
 
 clone_repo cue-lang cue 7fb7792580ac4aabed124138a9bf7760c314b82b
 
-find $SCRIPT_DIR/examples -type f -name '*.cue' \
-    | grep -vFf $SCRIPT_DIR/known_failures.txt \
-    | xargs tree-sitter parse -q -s
+# Each file in known_failures.txt must still fail to parse, so that the list
+# cannot go stale.
+status=0
+while read -r name; do
+	file=$SCRIPT_DIR/examples/$name
+	if [ ! -f "$file" ]; then
+		echo "$name: listed in known_failures.txt, but not found"
+		status=1
+	elif tree-sitter parse -q "$file" >/dev/null 2>&1; then
+		echo "$name: parses without errors; remove it from known_failures.txt"
+		status=1
+	fi
+done <"$SCRIPT_DIR/known_failures.txt"
+
+find "$SCRIPT_DIR/examples" -type f -name '*.cue' \
+    | grep -vFf "$SCRIPT_DIR/known_failures.txt" \
+    | xargs tree-sitter parse -q -s || status=1
+
+exit $status
