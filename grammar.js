@@ -421,6 +421,7 @@ module.exports = grammar({
     primary_expression: $ => choice(
       $.function,
       $._keyword_reference,
+      $._builtin_reference,
       $.parenthesized_expression,
       $.selector_expression,
       $.index_expression,
@@ -488,6 +489,10 @@ module.exports = grammar({
       choice('func', 'otherwise', 'fallback', 'try', 'else'),
       $.identifier,
     ))),
+
+    // The name of a builtin function used as a reference, as in x: len,
+    // rather than called.
+    _builtin_reference: $ => alias($.builtin_function, $.identifier),
 
     parenthesized_expression: $ => seq('(', $.expression, ')'),
 
