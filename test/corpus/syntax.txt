@@ -63,13 +63,12 @@ a: #{b: 1}
     (label
       (identifier))
     (value
-      (identifier)))
-  (struct_lit
-    (field
-      (label
-        (identifier))
-      (value
-        (number)))))
+      (struct_lit
+        (field
+          (label
+            (identifier))
+          (value
+            (number)))))))
 
 ================
 otherwise clause
@@ -95,14 +94,14 @@ for x in [] {
             (interpolation
               (identifier))))
         (value
-          (identifier)))))
-  (identifier)
-  (struct_lit
-    (field
-      (label
-        (identifier))
-      (value
-        (boolean)))))
+          (identifier))))
+    (else_clause
+      (struct_lit
+        (field
+          (label
+            (identifier))
+          (value
+            (boolean)))))))
 
 ===============
 fallback clause
@@ -128,14 +127,14 @@ for x in [] {
             (interpolation
               (identifier))))
         (value
-          (identifier)))))
-  (identifier)
-  (struct_lit
-    (field
-      (label
-        (identifier))
-      (value
-        (boolean)))))
+          (identifier))))
+    (else_clause
+      (struct_lit
+        (field
+          (label
+            (identifier))
+          (value
+            (boolean)))))))
 
 =============
 function type
@@ -216,14 +215,20 @@ a: 1 @foo(x) @bar(y)
 
 ===================
 closed list literal
-:error
 ===================
 
 a: #[1, 2]
 
 ---
 
-
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (list_lit
+        (number)
+        (number)))))
 
 ====================
 alias in parentheses

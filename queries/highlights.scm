@@ -25,6 +25,8 @@
 [
   "if"
   "else"
+  "otherwise"
+  "fallback"
 ] @conditional
 
 ; Repeats
@@ -136,6 +138,10 @@
   "?"
   "!"
 ] @punctuation.special
+
+(list_lit "#" @punctuation.special)
+
+(struct_lit "#" @punctuation.special)
 
 (spread_expression "..." @operator)
 

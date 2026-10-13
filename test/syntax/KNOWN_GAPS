@@ -23,7 +23,6 @@ pass/raw_string_quote.cue
 preview/call_chained.cue
 preview/call_labeled.cue
 preview/call_partial.cue
-preview/closed_list.cue
 preview/func_body_no_return.cue
 preview/func_body_postfix.cue
 preview/func_defaults.cue

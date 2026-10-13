@@ -136,6 +136,7 @@ module.exports = grammar({
     $._multi_raw_bytes_start,
     $._raw_end,
     $._raw_interpolation_start,
+    $._closed_hash,
     $._error_sentinel,
   ],
 
@@ -154,6 +155,7 @@ module.exports = grammar({
     [$._label_name, $.primary_expression],
     [$._label_name, $.string],
     [$.comprehension],
+    [$._label_name, $._keyword_reference],
   ],
 
   word: $ => $.identifier,
@@ -215,6 +217,8 @@ module.exports = grammar({
         'if',
         'for',
         'else',
+        'otherwise',
+        'fallback',
         'try',
         ...primitive_types,
       ),
@@ -294,13 +298,18 @@ module.exports = grammar({
       ),
     )),
 
-    list_lit: $ => seq('[', repeat($._list_elem), ']'),
+    // A '#' directly before the opening bracket or brace makes the list or
+    // struct closed, as in #[1, 2] and #{a: 1}.
+    list_lit: $ => seq(optional($._closed), '[', repeat($._list_elem), ']'),
 
     struct_lit: $ => seq(
+      optional($._closed),
       '{',
       optionalCommaSep($._declaration),
       '}',
     ),
+
+    _closed: $ => alias($._closed_hash, '#'),
 
     ellipsis: $ => prec.left(seq(
       '...',
@@ -391,7 +400,7 @@ module.exports = grammar({
       optional($.else_clause),
     ),
 
-    else_clause: $ => seq('else', $.struct_lit),
+    else_clause: $ => seq(choice('else', 'otherwise', 'fallback'), $.struct_lit),
 
     _alias_expr: $ => seq(
       optional(seq(field('alias', $.identifier), '=')),
@@ -405,6 +414,7 @@ module.exports = grammar({
     )),
 
     primary_expression: $ => choice(
+      $._keyword_reference,
       $.parenthesized_expression,
       $.selector_expression,
       $.index_expression,
@@ -459,6 +469,15 @@ module.exports = grammar({
       ))));
     },
 
+    // A keyword used as a reference, as in x: otherwise, outside the
+    // construct the keyword starts. Where the keyword can also start a
+    // clause, as otherwise and a struct after a comprehension, the parser
+    // prefers the clause.
+    _keyword_reference: $ => prec(-3, prec.dynamic(-1, alias(
+      choice('otherwise', 'fallback'),
+      $.identifier,
+    ))),
+
     parenthesized_expression: $ => seq('(', $.expression, ')'),
 
     call_expression: $ => prec(PREC.call, seq(
@@ -466,6 +485,8 @@ module.exports = grammar({
         $.builtin_function,
         $.selector_expression,
         $.identifier,
+        // A keyword called as a function, as in otherwise(1).
+        alias(choice('otherwise', 'fallback'), $.identifier),
       )),
       $.arguments,
     )),
