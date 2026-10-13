@@ -11,11 +11,9 @@ pass/float_then_unit_label.cue
 pass/keyword_ref_then_field.cue
 pass/keyword_refs_clause_words.cue
 pass/keyword_refs_line_end.cue
-pass/label_dynamic_after_reference.cue
 pass/label_raw_string.cue
 pass/multiline_interp_quotes.cue
 pass/multiline_quote_runs.cue
 pass/postfix_ellipsis_int.cue
 pass/postfix_ellipsis_signed.cue
 pass/raw_string_quote.cue
-preview/call_chained.cue

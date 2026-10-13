@@ -763,3 +763,59 @@ n: func(a: int) -> x.y: 1
           (identifier)
           (identifier))
         (number)))))
+
+==========================
+call on a call or an index
+==========================
+
+g: f(1, ...)(2)
+h: l[0](1, 2)
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (call_expression
+        (call_expression
+          (identifier)
+          (arguments
+            (number)
+            (ellipsis)))
+        (arguments
+          (number)))))
+  (field
+    (label
+      (identifier))
+    (value
+      (call_expression
+        (index_expression
+          (identifier)
+          (number))
+        (arguments
+          (number)
+          (number))))))
+
+===============================
+dynamic label after a reference
+===============================
+
+a: k
+(k): 2
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (identifier)))
+  (field
+    (label
+      (dynamic
+        (identifier)))
+    (value
+      (number))))
