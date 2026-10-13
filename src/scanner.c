@@ -18,6 +18,7 @@ enum TokenType {
   RAW_END,
   RAW_INTERPOLATION_START,
   CLOSED_HASH,
+  SPREAD_INT,
   ERROR_SENTINEL,
 };
 
@@ -95,16 +96,9 @@ static bool scan_multiline(TSLexer *lexer, int c) {
 // scan_hash_start scans a token starting with '#': the opening delimiter of
 // a raw string, which is one or more '#' then a quote, or three quotes for a
 // multiline literal; or a single '#' directly before '[' or '{', which opens
-// a closed list or struct. Unlike the other tokens here, it can follow
-// whitespace.
+// a closed list or struct.
 static bool scan_hash_start(Scanner *s, TSLexer *lexer,
                             const bool *valid_symbols) {
-  while (iswspace(lexer->lookahead)) {
-    skip(lexer);
-  }
-  if (lexer->lookahead != '#') {
-    return false;
-  }
   unsigned hashes = 0;
   while (lexer->lookahead == '#') {
     advance(lexer);
@@ -143,6 +137,26 @@ static bool scan_hash_start(Scanner *s, TSLexer *lexer,
   s->stack[s->depth++] = (RawString){
       .hashes = (uint8_t)hashes, .quote = quote, .multiline = multiline};
   lexer->result_symbol = symbol;
+  return true;
+}
+
+// scan_spread_int scans a decimal integer that "..." directly follows, as in
+// the spread 1..., stopping before the ellipsis.
+static bool scan_spread_int(TSLexer *lexer) {
+  if (!iswdigit(lexer->lookahead)) {
+    return false;
+  }
+  while (iswdigit(lexer->lookahead) || lexer->lookahead == '_') {
+    advance(lexer);
+  }
+  lexer->mark_end(lexer);
+  for (int i = 0; i < 3; i++) {
+    if (lexer->lookahead != '.') {
+      return false;
+    }
+    advance(lexer);
+  }
+  lexer->result_symbol = SPREAD_INT;
   return true;
 }
 
@@ -237,12 +251,22 @@ static bool scan(Scanner *s, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[RAW_END] && s->depth > 0) {
     return scan_raw_body(s, lexer, valid_symbols);
   }
-  if (valid_symbols[RAW_STR_START] || valid_symbols[RAW_BYTES_START] ||
-      valid_symbols[MULTI_RAW_STR_START] ||
-      valid_symbols[MULTI_RAW_BYTES_START] || valid_symbols[CLOSED_HASH]) {
-    return scan_hash_start(s, lexer, valid_symbols);
+  // The tokens below can follow whitespace.
+  bool hash_start = valid_symbols[RAW_STR_START] ||
+                    valid_symbols[RAW_BYTES_START] ||
+                    valid_symbols[MULTI_RAW_STR_START] ||
+                    valid_symbols[MULTI_RAW_BYTES_START] ||
+                    valid_symbols[CLOSED_HASH];
+  if (!hash_start && !valid_symbols[SPREAD_INT]) {
+    return false;
   }
-  return false;
+  while (iswspace(lexer->lookahead)) {
+    skip(lexer);
+  }
+  if (lexer->lookahead == '#') {
+    return hash_start && scan_hash_start(s, lexer, valid_symbols);
+  }
+  return valid_symbols[SPREAD_INT] && scan_spread_int(lexer);
 }
 
 void *tree_sitter_cue_external_scanner_create() {

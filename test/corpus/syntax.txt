@@ -819,3 +819,50 @@ a: k
         (identifier)))
     (value
       (number))))
+
+====================
+spread on an integer
+====================
+
+a: 1...
+b: 1.5...
+c: 1.
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (spread_expression
+        (number))))
+  (field
+    (label
+      (identifier))
+    (value
+      (spread_expression
+        (float))))
+  (field
+    (label
+      (identifier))
+    (value
+      (float))))
+
+=====================================
+hashes before a spread on an integer
+=====================================
+
+a: ##1...
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (identifier)))
+  (identifier)
+  (spread_expression
+    (number)))

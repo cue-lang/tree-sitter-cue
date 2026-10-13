@@ -1267,6 +1267,10 @@
       "required": true,
       "types": [
         {
+          "type": "number",
+          "named": true
+        },
+        {
           "type": "primary_expression",
           "named": true
         }

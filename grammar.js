@@ -137,6 +137,7 @@ module.exports = grammar({
     $._raw_end,
     $._raw_interpolation_start,
     $._closed_hash,
+    $._spread_int,
     $._error_sentinel,
   ],
 
@@ -435,9 +436,11 @@ module.exports = grammar({
 
     // The spread operator, as in #A...: the ellipsis directly follows its
     // operand. An ellipsis after whitespace, such as one on its own line in
-    // a struct, is a separate declaration.
+    // a struct, is a separate declaration. The external scanner recognizes
+    // an integer operand, as in 1..., which would otherwise lex as the float
+    // 1. followed by "..".
     spread_expression: $ => prec(PREC.call, seq(
-      $.primary_expression,
+      choice($.primary_expression, alias($._spread_int, $.number)),
       token.immediate('...'),
     )),
 
