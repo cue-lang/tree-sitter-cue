@@ -159,6 +159,7 @@ module.exports = grammar({
     [$._label_name, $.string],
     [$.comprehension],
     [$._label_name, $._keyword_reference],
+    [$._keyword_reference, $.try_clause],
     [$.primary_expression, $.parameter],
     [$._attr_item],
   ],
@@ -395,10 +396,13 @@ module.exports = grammar({
 
     _clause: $ => choice($.for_clause, $.guard_clause, $.let_clause, $.try_clause),
 
-    try_clause: $ => seq(
+    // try may also be a reference followed by the next declaration, as in
+    // try and then b: 1 on the next line, so the parser keeps both readings
+    // until a token decides.
+    try_clause: $ => prec(-3, seq(
       'try',
       optional(seq(field('left', choice($.identifier, '_')), '=', field('right', $.expression))),
-    ),
+    )),
 
     // A word after the struct may start an else clause or, when CUE ends
     // the comprehension at a newline, the label of the next field, so the

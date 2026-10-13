@@ -341,3 +341,60 @@ x: {
     (comprehension
      (try_clause right: (postfix_expression (identifier)))
      (struct_lit (field (label (identifier)) (value (number)))))))))
+
+===
+try and else as references followed by a declaration
+===
+
+a: {
+	try
+	b: 1
+}
+c: {
+	try
+	let d = 1
+	e: d
+}
+f: {
+	else
+	g: 2
+}
+h: {
+	try for x in l {i: x}
+	try let y = a? {j: y}
+}
+
+---
+
+(source_file
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (identifier)
+    (field (label (identifier)) (value (number))))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (identifier)
+    (let_clause left: (identifier) right: (number))
+    (field (label (identifier)) (value (identifier))))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (identifier)
+    (field (label (identifier)) (value (number))))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (try_clause)
+     (for_clause (identifier) (identifier))
+     (struct_lit (field (label (identifier)) (value (identifier)))))
+    (comprehension
+     (try_clause)
+     (let_clause left: (identifier) right: (postfix_expression (identifier)))
+     (struct_lit (field (label (identifier)) (value (identifier)))))))))
