@@ -118,3 +118,145 @@ myStruct2: {
               (attribute
                 (identifier)
                 (identifier)))))))
+
+===
+nested brackets
+===
+
+a: 1 @foo((x))
+b: 2 @foo(a=b(c), [d, {e}])
+c: 3 @protobuf(1,(gogoproto.nullable)=false)
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (number)
+      (package_path
+        (identifier)
+        (identifier))
+      (boolean))))
+
+===
+brackets after =
+===
+
+a: 1 @foo(x=1, y=[1,2])
+b: 2 @foo(a=[1], b={c}, c=(d))
+c: 3 @go(,type=[]string)
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)
+      (attr_path)
+      (identifier)
+      (number)
+      (number)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)
+      (number)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)
+      (slice_type
+        (primitive_type)))))
+
+===
+angle brackets and stars
+===
+
+a: 1 @test(eq, <4)
+b: 2 @foo(x<1)
+c: 3 @foo(*[1] | [2])
+d: 4 @go(x,type=*string)
+
+---
+
+(source_file
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)
+      (number)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)
+      (number)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (number)
+      (number)))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))
+    (attribute
+      (identifier)
+      (identifier)
+      (identifier)
+      (pointer_type
+        (primitive_type)))))

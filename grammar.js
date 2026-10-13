@@ -160,6 +160,7 @@ module.exports = grammar({
     [$.comprehension],
     [$._label_name, $._keyword_reference],
     [$.primary_expression, $.parameter],
+    [$._attr_item],
   ],
 
   word: $ => $.identifier,
@@ -235,21 +236,23 @@ module.exports = grammar({
       field('name', $.identifier),
       '(',
       optional(choice(',', '-')),
-      repeat(
-        prec.right(choice(
-          commaSep1($._attr_token),
-          seq('(', commaSep($._attr_token), ')'),
-          seq('[', commaSep($._attr_token), ']'),
-          seq('{', commaSep($._attr_token), '}'),
-          seq('<', commaSep($._attr_token), '>'),
-        )),
-      ),
+      repeat($._attr_group),
       ')',
     ),
-    _attr_token: $ => prec.right(choice(
+    // Brackets nest in the body of an attribute, as in @foo((x)),
+    // @foo(a=b(c)) and @foo(a=[1, 2]). Only (), [] and {} nest, as in CUE:
+    // < and > are ordinary characters, as in @test(eq, <4).
+    _attr_group: $ => prec.right(choice(
       $._attr_item,
-      seq($._attr_item, '=', choice($._attr_item, $.attr_path)),
-      seq('(', $._attr_item, ')', '=', choice($._attr_item, $.attr_path)),
+      ',',
+      prec.right(seq('=', optional(choice($._attr_item, $.attr_path, $._attr_brackets)))),
+      $._attr_brackets,
+    )),
+
+    _attr_brackets: $ => prec.right(choice(
+      seq('(', repeat($._attr_group), ')'),
+      seq('[', repeat($._attr_group), ']'),
+      seq('{', repeat($._attr_group), '}'),
     )),
 
     _attr_item: $ => choice(
@@ -263,7 +266,8 @@ module.exports = grammar({
       $.bottom,
       $.primitive_type,
       seq('[', ']', alias($._attr_item, $.slice_type)),
-      seq('*', alias($._attr_item, $.pointer_type)),
+      // A * may stand alone, as in @foo(*[1] | [2]).
+      seq('*', optional(prec.dynamic(1, alias($._attr_item, $.pointer_type)))),
       $.package_path,
       $.identifier,
       prec(-1, /[^0-9_]/),
