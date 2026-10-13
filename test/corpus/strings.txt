@@ -58,3 +58,52 @@ s3: #"""
     (field (label (identifier)) (value (string (interpolation (identifier)))))
     (field (label (identifier)) (value (string (interpolation (identifier))))) 
     (field (label (identifier)) (value (string (raw_interpolation (identifier))))))
+
+===
+quotes of the other kind in a multiline string
+===
+
+a: 1
+b: 2
+x: """
+	use '""' for empty
+	"""
+y: '''
+	use "''" for empty
+	'''
+z: """
+	\(a)'""\(b)
+	"""
+
+---
+
+(source_file
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (string)))
+ (field (label (identifier)) (value (string)))
+ (field (label (identifier)) (value (string
+  (interpolation (identifier)) (interpolation (identifier))))))
+
+===
+quotes between interpolations in a multiline string
+===
+
+x: """
+	\(a)'\(b)
+	\(a)"\(b)
+	\(a)""\(b)
+	"""
+y: '''
+	\(a)'\(b)
+	'''
+
+---
+
+(source_file
+ (field (label (identifier)) (value (string
+  (interpolation (identifier)) (interpolation (identifier))
+  (interpolation (identifier)) (interpolation (identifier))
+  (interpolation (identifier)) (interpolation (identifier)))))
+ (field (label (identifier)) (value (string
+  (interpolation (identifier)) (interpolation (identifier))))))

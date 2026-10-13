@@ -3,6 +3,4 @@
 # cleanly; with --update, it removes such files, and deletes this file once
 # it lists none.
 pass/keyword_refs_line_end.cue
-pass/multiline_interp_quotes.cue
-pass/multiline_quote_runs.cue
 pass/raw_string_quote.cue
