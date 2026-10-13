@@ -333,6 +333,7 @@ module.exports = grammar({
       prec(1, alias($.builtin_function, $.identifier)),
       prec(1, alias(choice('null', 'true', 'false'), $.identifier)),
       prec.dynamic(1, alias($._simple_string_lit, $.string)),
+      prec.dynamic(1, alias($._simple_raw_string_lit, $.string)),
       prec.dynamic(1, $.selector_expression),
       prec.dynamic(1, alias($.parenthesized_expression, $.dynamic)),
     ),

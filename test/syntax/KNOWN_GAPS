@@ -9,7 +9,6 @@ pass/blank_identifier.cue
 pass/keyword_ref_then_field.cue
 pass/keyword_refs_clause_words.cue
 pass/keyword_refs_line_end.cue
-pass/label_raw_string.cue
 pass/multiline_interp_quotes.cue
 pass/multiline_quote_runs.cue
 pass/raw_string_quote.cue
