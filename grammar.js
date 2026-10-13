@@ -138,6 +138,8 @@ module.exports = grammar({
     $._raw_interpolation_start,
     $._closed_hash,
     $._spread_int,
+    $.multiplier,
+    $._line_start,
     $._error_sentinel,
   ],
 
@@ -469,7 +471,10 @@ module.exports = grammar({
     unary_expression: $ => {
       const unary_operators = ['+', '-', '!', '*', '==', '!=', '<', '<=', '>', '>=', '=~', '!~'];
 
+      // The external scanner marks an operator at the start of a line, which
+      // CUE reads as unary, so that it does not continue the line before.
       return choice(...unary_operators.map((operator) => prec(PREC.unary, seq(
+        optional($._line_start),
         field('operator', operator),
         field('argument', $.expression),
       ))));
@@ -604,25 +609,24 @@ module.exports = grammar({
 
     null: _ => 'null',
 
+    // A number has no sign: -1 is a unary expression, as in CUE.
     number: _ => {
       const binary_literal = seq(
-        /0[bB]/,
+        /0[bB]_?/,
         /[01](_?[01])*/,
       );
 
       const hex_literal = seq(
-        /0[xX]/,
+        /0[xX]_?/,
         /[\da-fA-F](_?[\da-fA-F])*/,
       );
 
       const octal_literal = seq(
-        optional(choice('-', '+')),
-        /0[oO]/,
+        /0[oO]_?/,
         /[0-7](_?[0-7])*/,
       );
 
       const decimal_digits = /\d(_?\d)*/;
-      const signed_integer = seq(optional(choice('-', '+')), decimal_digits);
 
       const decimal_integer_literal = choice(
         '0',
@@ -630,9 +634,8 @@ module.exports = grammar({
       );
 
       const decimal_literal = choice(
-        seq(optional(choice('-', '+')), decimal_integer_literal),
+        decimal_integer_literal,
         decimal_digits,
-        signed_integer,
       );
 
 
@@ -653,7 +656,7 @@ module.exports = grammar({
       const decimal_exponent = seq(choice('e', 'E'), optional(choice('+', '-')), decimal_digits);
 
       const decimal_float_literal = choice(
-        seq(optional('-'), optional(decimal_digits), '.', optional(decimal_digits), optional(decimal_exponent)),
+        seq(optional(decimal_digits), '.', optional(decimal_digits), optional(decimal_exponent)),
         seq(decimal_digits, decimal_exponent),
       );
 
@@ -668,14 +671,12 @@ module.exports = grammar({
       return token(choice(decimal_float_literal, hex_float_literal));
     },
 
+    // A number with a multiplier, as in 1Ki and 1.5G. The external scanner
+    // recognizes the multiplier only directly after the number, so that a
+    // label on the next line, such as Pi, is not taken as one.
     si_unit: $ => seq(
-      $.float,
-      field('unit',
-        token.immediate(seq(
-          choice('K', 'M', 'G', 'T', 'P'),
-          optional('i'),
-        )),
-      ),
+      choice($.float, $.number),
+      field('unit', $.multiplier),
     ),
 
     escape_char: _ => token.immediate(seq(

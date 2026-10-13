@@ -169,9 +169,7 @@
 
 (float) @float
 
-(si_unit
-  (float)
-  (_) @symbol)
+(multiplier) @symbol
 
 (boolean) @boolean
 

@@ -7,12 +7,10 @@ pass/attr_bracket_values.cue
 pass/attr_nested_parens.cue
 pass/blank_identifier.cue
 pass/builtin_refs.cue
-pass/float_then_unit_label.cue
 pass/keyword_ref_then_field.cue
 pass/keyword_refs_clause_words.cue
 pass/keyword_refs_line_end.cue
 pass/label_raw_string.cue
 pass/multiline_interp_quotes.cue
 pass/multiline_quote_runs.cue
-pass/postfix_ellipsis_signed.cue
 pass/raw_string_quote.cue

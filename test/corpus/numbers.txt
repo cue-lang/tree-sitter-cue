@@ -52,8 +52,8 @@ i7: 0b0101_0001
 
 (source_file 
  (field (label (identifier)) (value (number)))
- (field (label (identifier)) (value (si_unit (float))))
- (field (label (identifier)) (value (si_unit (float))))
+ (field (label (identifier)) (value (si_unit (float) (multiplier))))
+ (field (label (identifier)) (value (si_unit (float) (multiplier))))
  (field (label (identifier)) (value (number)))
  (field (label (identifier)) (value (number)))
  (field (label (identifier)) (value (number)))
@@ -87,8 +87,8 @@ f11: -.25
  (field (label (identifier)) (value (float)))
  (field (label (identifier)) (value (float)))
  (field (label (identifier)) (value (float)))
- (field (label (identifier)) (value (float)))
- (field (label (identifier)) (value (float))))
+ (field (label (identifier)) (value (unary_expression (float))))
+ (field (label (identifier)) (value (unary_expression (float)))))
 
 ===
 subtraction without spaces
@@ -100,10 +100,8 @@ b: 2-1
 ---
 
 (source_file
- (field (label (identifier)) (value (identifier)))
- (number)
- (field (label (identifier)) (value (number)))
- (number))
+ (field (label (identifier)) (value (binary_expression (identifier) (number))))
+ (field (label (identifier)) (value (binary_expression (number) (number)))))
 
 ===
 multiplier on an integer
@@ -115,10 +113,8 @@ b: 0M
 ---
 
 (source_file
- (field (label (identifier)) (value (number)))
- (identifier)
- (field (label (identifier)) (value (number)))
- (identifier))
+ (field (label (identifier)) (value (si_unit (number) (multiplier))))
+ (field (label (identifier)) (value (si_unit (number) (multiplier)))))
 
 ===
 underscore after a base prefix
@@ -132,11 +128,25 @@ c: 0b_1
 
 (source_file
  (field (label (identifier)) (value (number)))
- (identifier)
  (field (label (identifier)) (value (number)))
- (identifier)
+ (field (label (identifier)) (value (number))))
+
+===
+multiplier and a label on the next line
+===
+
+E: 2.5
+Pi: 3.1
+K: 1
+Mi: 2
+
+---
+
+(source_file
+ (field (label (identifier)) (value (float)))
+ (field (label (identifier)) (value (float)))
  (field (label (identifier)) (value (number)))
- (identifier))
+ (field (label (identifier)) (value (number))))
 
 ===
 operators at the start of a line
@@ -156,7 +166,10 @@ e: 1
 ---
 
 (source_file
- (field (label (identifier)) (value (list_lit (number) (number))))
- (field (label (identifier)) (value (binary_expression (identifier) (identifier))))
- (field (label (identifier)) (value (binary_expression (primitive_type) (number))))
- (field (label (identifier)) (value (binary_expression (number) (number)))))
+ (field (label (identifier)) (value (list_lit (number) (unary_expression (number)))))
+ (field (label (identifier)) (value (identifier)))
+ (unary_expression (identifier))
+ (field (label (identifier)) (value (primitive_type)))
+ (unary_expression (number))
+ (field (label (identifier)) (value (number)))
+ (unary_expression (number)))
