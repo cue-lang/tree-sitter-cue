@@ -75,6 +75,11 @@
   "->"
 ] @operator
 
+; Variables, which the more specific patterns below override, since a
+; later pattern takes precedence
+
+(identifier) @variable
+
 ; Fields & Properties
 
 (field
@@ -98,17 +103,15 @@
 
 (builtin_function) @function.builtin
 
-; Variables
-
-(identifier) @variable
-
-; Parameters, after variables, since a later pattern takes precedence
+; Parameters
 
 (parameter
   name: (identifier) @parameter)
 
 (labeled_argument
   label: (identifier) @parameter)
+
+; Builtin variables
 
 ((identifier) @variable.builtin
   (#any-of? @variable.builtin "self" "__self"))
