@@ -148,3 +148,15 @@ try { x: a? }
  (comprehension
   (try_clause)
   (struct_lit (field (label (identifier)) (value (postfix_expression (identifier)))))))
+
+===
+field named else after a comprehension
+:error
+===
+
+x: {
+	for a in [] {}
+	else: 1
+}
+
+---
