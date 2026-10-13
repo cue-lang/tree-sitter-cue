@@ -19,6 +19,8 @@ enum TokenType {
   RAW_INTERPOLATION_START,
   CLOSED_HASH,
   SPREAD_INT,
+  MULTIPLIER,
+  LINE_START,
   ERROR_SENTINEL,
 };
 
@@ -160,6 +162,66 @@ static bool scan_spread_int(TSLexer *lexer) {
   return true;
 }
 
+// scan_multiplier scans the multiplier that directly follows a number, as in
+// 1Ki and 1.5G.
+static bool scan_multiplier(TSLexer *lexer) {
+  switch (lexer->lookahead) {
+  case 'K':
+  case 'M':
+  case 'G':
+  case 'T':
+  case 'P':
+    break;
+  default:
+    return false;
+  }
+  advance(lexer);
+  if (lexer->lookahead == 'i') {
+    advance(lexer);
+  }
+  lexer->result_symbol = MULTIPLIER;
+  return true;
+}
+
+// is_operator_start reports whether c can start an operator that is unary at
+// the start of a line.
+static bool is_operator_start(int32_t c) {
+  switch (c) {
+  case '-':
+  case '+':
+  case '!':
+  case '*':
+  case '<':
+  case '>':
+  case '=':
+    return true;
+  default:
+    return false;
+  }
+}
+
+// starts_unary_operator reports whether the lookahead starts a unary operator:
+// -, +, !, *, or one of the relational operators <, <=, >, >=, ==, !=, =~ and
+// !~. It may advance past the operator's first character.
+static bool starts_unary_operator(TSLexer *lexer) {
+  switch (lexer->lookahead) {
+  case '-':
+    advance(lexer);
+    return lexer->lookahead != '>';
+  case '+':
+  case '!':
+  case '*':
+  case '<':
+  case '>':
+    return true;
+  case '=':
+    advance(lexer);
+    return lexer->lookahead == '=' || lexer->lookahead == '~';
+  default:
+    return false;
+  }
+}
+
 // scan_hashes advances over up to n '#' characters and reports whether there
 // were n of them.
 static bool scan_hashes(TSLexer *lexer, unsigned n) {
@@ -251,17 +313,37 @@ static bool scan(Scanner *s, TSLexer *lexer, const bool *valid_symbols) {
   if (valid_symbols[RAW_END] && s->depth > 0) {
     return scan_raw_body(s, lexer, valid_symbols);
   }
+  if (valid_symbols[MULTIPLIER] && scan_multiplier(lexer)) {
+    return true;
+  }
   // The tokens below can follow whitespace.
   bool hash_start = valid_symbols[RAW_STR_START] ||
                     valid_symbols[RAW_BYTES_START] ||
                     valid_symbols[MULTI_RAW_STR_START] ||
                     valid_symbols[MULTI_RAW_BYTES_START] ||
                     valid_symbols[CLOSED_HASH];
-  if (!hash_start && !valid_symbols[SPREAD_INT]) {
+  if (!hash_start && !valid_symbols[SPREAD_INT] &&
+      !valid_symbols[LINE_START]) {
     return false;
   }
+  bool newline = false;
   while (iswspace(lexer->lookahead)) {
+    if (lexer->lookahead == '\n') {
+      newline = true;
+    }
     skip(lexer);
+  }
+  // An operator at the start of a line is unary: CUE ends the line before it
+  // with a comma unless the line ends with an operator, so it never reads such
+  // an operator as binary. The token is empty and precedes the operator.
+  if (newline && valid_symbols[LINE_START] &&
+      is_operator_start(lexer->lookahead)) {
+    lexer->mark_end(lexer);
+    if (starts_unary_operator(lexer)) {
+      lexer->result_symbol = LINE_START;
+      return true;
+    }
+    return false;
   }
   if (lexer->lookahead == '#') {
     return hash_start && scan_hash_start(s, lexer, valid_symbols);

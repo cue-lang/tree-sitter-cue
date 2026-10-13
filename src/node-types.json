@@ -1128,13 +1128,28 @@
   {
     "type": "si_unit",
     "named": true,
-    "fields": {},
+    "fields": {
+      "unit": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "multiplier",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": false,
       "required": true,
       "types": [
         {
           "type": "float",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -1797,6 +1812,10 @@
   {
     "type": "mod",
     "named": false
+  },
+  {
+    "type": "multiplier",
+    "named": true
   },
   {
     "type": "null",
