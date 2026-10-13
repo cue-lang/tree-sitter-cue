@@ -389,7 +389,7 @@ module.exports = grammar({
 
     try_clause: $ => seq(
       'try',
-      optional(seq(field('left', $.identifier), '=', field('right', $.expression))),
+      optional(seq(field('left', choice($.identifier, '_')), '=', field('right', $.expression))),
     ),
 
     // A word after the struct may start an else clause or, when CUE ends
@@ -477,7 +477,7 @@ module.exports = grammar({
     // clause, as otherwise and a struct after a comprehension, the parser
     // prefers the clause.
     _keyword_reference: $ => prec(-3, prec.dynamic(-1, alias(
-      choice('func', 'otherwise', 'fallback'),
+      choice('func', 'otherwise', 'fallback', 'try', 'else'),
       $.identifier,
     ))),
 
@@ -534,8 +534,9 @@ module.exports = grammar({
         $.builtin_function,
         $.selector_expression,
         $.identifier,
-        // A keyword called as a function, as in otherwise(1).
-        alias(choice('otherwise', 'fallback'), $.identifier),
+        // A keyword called as a function, as in otherwise(1). func( starts
+        // a function literal instead.
+        alias(choice('otherwise', 'fallback', 'try', 'else'), $.identifier),
         $.parenthesized_expression,
       )),
       $.arguments,

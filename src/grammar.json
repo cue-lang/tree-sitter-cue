@@ -1932,8 +1932,17 @@
                   "type": "FIELD",
                   "name": "left",
                   "content": {
-                    "type": "SYMBOL",
-                    "name": "identifier"
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "identifier"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "_"
+                      }
+                    ]
                   }
                 },
                 {
@@ -2844,6 +2853,14 @@
               {
                 "type": "STRING",
                 "value": "fallback"
+              },
+              {
+                "type": "STRING",
+                "value": "try"
+              },
+              {
+                "type": "STRING",
+                "value": "else"
               }
             ]
           },
@@ -3215,6 +3232,14 @@
                       {
                         "type": "STRING",
                         "value": "fallback"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "try"
+                      },
+                      {
+                        "type": "STRING",
+                        "value": "else"
                       }
                     ]
                   },

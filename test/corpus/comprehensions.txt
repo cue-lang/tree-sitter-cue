@@ -284,3 +284,60 @@ y: {
      (struct_lit (field (label (identifier)) (value (identifier))))
      (else_clause (struct_lit (field (label (identifier)) (value (number))))))
     (field (label (identifier)) (value (number)))))))
+
+===
+try and else as references
+===
+
+try:  1
+else: 2
+x: try
+y: else
+z: {
+	try
+}
+
+---
+
+(source_file
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (number)))
+ (field (label (identifier)) (value (identifier)))
+ (field (label (identifier)) (value (identifier)))
+ (field (label (identifier)) (value (struct_lit (identifier)))))
+
+===
+try and else called as functions
+===
+
+a: try(1)
+b: else(1)
+
+---
+
+(source_file
+ (field
+  (label (identifier))
+  (value (call_expression (identifier) (arguments (number)))))
+ (field
+  (label (identifier))
+  (value (call_expression (identifier) (arguments (number))))))
+
+===
+try assignment to _
+===
+
+x: {
+	try _ = a? {b: 1}
+}
+
+---
+
+(source_file
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (try_clause right: (postfix_expression (identifier)))
+     (struct_lit (field (label (identifier)) (value (number)))))))))
