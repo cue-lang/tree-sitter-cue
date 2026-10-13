@@ -60,6 +60,12 @@ static bool scan_multiline(TSLexer *lexer, int c) {
     switch (lexer->lookahead) {
     case '\'':
     case '"':
+      if (lexer->lookahead != c) {
+        // The other quote character is content, as in '""' in a """ string.
+        advance(lexer);
+        has_content = true;
+        break;
+      }
       lexer->mark_end(lexer);
       advance(lexer);
       if (lexer->lookahead == c) {
@@ -68,6 +74,8 @@ static bool scan_multiline(TSLexer *lexer, int c) {
           return has_content;
         }
       }
+      // Quotes that do not close the literal are content, as in \(a)"\(b).
+      has_content = true;
       break;
     case '\\':
       lexer->mark_end(lexer);
