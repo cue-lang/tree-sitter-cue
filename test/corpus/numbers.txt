@@ -89,3 +89,74 @@ f11: -.25
  (field (label (identifier)) (value (float)))
  (field (label (identifier)) (value (float)))
  (field (label (identifier)) (value (float))))
+
+===
+subtraction without spaces
+===
+
+a: x-1
+b: 2-1
+
+---
+
+(source_file
+ (field (label (identifier)) (value (identifier)))
+ (number)
+ (field (label (identifier)) (value (number)))
+ (number))
+
+===
+multiplier on an integer
+===
+
+a: 1Ki
+b: 0M
+
+---
+
+(source_file
+ (field (label (identifier)) (value (number)))
+ (identifier)
+ (field (label (identifier)) (value (number)))
+ (identifier))
+
+===
+underscore after a base prefix
+===
+
+a: 0X_1f
+b: 0o_7
+c: 0b_1
+
+---
+
+(source_file
+ (field (label (identifier)) (value (number)))
+ (identifier)
+ (field (label (identifier)) (value (number)))
+ (identifier)
+ (field (label (identifier)) (value (number)))
+ (identifier))
+
+===
+operators at the start of a line
+===
+
+x: [
+	1
+	-1
+]
+a: b
+-c
+d: int
+*1
+e: 1
+<=5
+
+---
+
+(source_file
+ (field (label (identifier)) (value (list_lit (number) (number))))
+ (field (label (identifier)) (value (binary_expression (identifier) (identifier))))
+ (field (label (identifier)) (value (binary_expression (primitive_type) (number))))
+ (field (label (identifier)) (value (binary_expression (number) (number)))))
