@@ -151,7 +151,6 @@ try { x: a? }
 
 ===
 field named else after a comprehension
-:error
 ===
 
 x: {
@@ -160,3 +159,13 @@ x: {
 }
 
 ---
+
+(source_file
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (comprehension
+     (for_clause (identifier) (list_lit))
+     (struct_lit))
+    (field (label (identifier)) (value (number)))))))
