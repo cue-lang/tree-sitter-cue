@@ -2178,8 +2178,22 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "primary_expression"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "primary_expression"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_spread_int"
+                },
+                "named": true,
+                "value": "number"
+              }
+            ]
           },
           {
             "type": "IMMEDIATE_TOKEN",
@@ -5027,6 +5041,10 @@
     {
       "type": "SYMBOL",
       "name": "_closed_hash"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_spread_int"
     },
     {
       "type": "SYMBOL",
