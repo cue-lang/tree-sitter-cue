@@ -156,6 +156,7 @@ module.exports = grammar({
     [$._label_name, $.string],
     [$.comprehension],
     [$._label_name, $._keyword_reference],
+    [$.primary_expression, $.parameter],
   ],
 
   word: $ => $.identifier,
@@ -220,6 +221,7 @@ module.exports = grammar({
         'otherwise',
         'fallback',
         'try',
+        'func',
         ...primitive_types,
       ),
       $.identifier,
@@ -414,6 +416,7 @@ module.exports = grammar({
     )),
 
     primary_expression: $ => choice(
+      $.function,
       $._keyword_reference,
       $.parenthesized_expression,
       $.selector_expression,
@@ -474,11 +477,57 @@ module.exports = grammar({
     // clause, as otherwise and a struct after a comprehension, the parser
     // prefers the clause.
     _keyword_reference: $ => prec(-3, prec.dynamic(-1, alias(
-      choice('otherwise', 'fallback'),
+      choice('func', 'otherwise', 'fallback'),
       $.identifier,
     ))),
 
     parenthesized_expression: $ => seq('(', $.expression, ')'),
+
+    // A function literal, as in func(a: int) -> int: a + 1, or a function
+    // type, as in func(int) -> int.
+    function: $ => prec.right(seq(
+      'func',
+      $.parameters,
+      optional(choice(
+        seq(
+          '->',
+          field('result', $.expression),
+          optional(seq(':', field('body', $.expression))),
+        ),
+        seq(':', field('body', $.expression)),
+      )),
+    )),
+
+    // A trailing ellipsis makes the signature open, as in func(int, ...).
+    // The parameters directly follow func, as cue fmt writes them, so that
+    // a dynamic label such as (k) on the line after a reference to func is
+    // not taken as parameters.
+    parameters: $ => seq(
+      token.immediate('('),
+      commaSep(choice($.parameter, $.ellipsis), true),
+      ')',
+    ),
+
+    parameter: $ => seq(
+      optional(choice(
+        seq(
+          field('name', $.identifier),
+          optional($.postfix_alias),
+          optional(choice('?', '!')),
+          ':',
+        ),
+        // An anonymous parameter, as in _~x: int, cannot be optional or
+        // required.
+        seq(
+          field('name', alias('_', $.identifier)),
+          optional($.postfix_alias),
+          ':',
+        ),
+      )),
+      field('type', $.expression),
+      optional(seq('=', field('default', $.expression))),
+      repeat($.attribute),
+    ),
 
     call_expression: $ => prec(PREC.call, seq(
       field('function', choice(
@@ -487,28 +536,38 @@ module.exports = grammar({
         $.identifier,
         // A keyword called as a function, as in otherwise(1).
         alias(choice('otherwise', 'fallback'), $.identifier),
+        $.parenthesized_expression,
       )),
       $.arguments,
     )),
 
-    index_expression: $ => seq(
+    // A selector or an index binds tighter than the end of a function's
+    // body or result, as in func(s: int): s.x.
+    index_expression: $ => prec(PREC.call, seq(
       $.primary_expression,
       token.immediate('['),
       field('index', $.expression),
       optional(','),
       ']',
-    ),
+    )),
 
-    selector_expression: $ => seq(
+    selector_expression: $ => prec(PREC.call, seq(
       $.primary_expression,
       '.',
       choice($.identifier, alias($._simple_string_lit, $.string)),
-    ),
+    )),
 
+    // A trailing ellipsis applies a function partially, as in f(1, ...).
     arguments: $ => seq(
       '(',
-      commaSep(optional($.expression)),
+      commaSep(optional(choice($.expression, $.labeled_argument, $.ellipsis))),
       ')',
+    ),
+
+    labeled_argument: $ => seq(
+      field('label', $.identifier),
+      ':',
+      field('value', $.expression),
     ),
 
     literal: $ =>

@@ -44,6 +44,8 @@
   "try"
 ] @keyword
 
+"func" @keyword.function
+
 [
   "in"
 ] @keyword.operator
@@ -70,6 +72,7 @@
   "!"
   "="
   "~"
+  "->"
 ] @operator
 
 ; Fields & Properties
@@ -98,6 +101,14 @@
 ; Variables
 
 (identifier) @variable
+
+; Parameters, after variables, since a later pattern takes precedence
+
+(parameter
+  name: (identifier) @parameter)
+
+(labeled_argument
+  label: (identifier) @parameter)
 
 ((identifier) @variable.builtin
   (#any-of? @variable.builtin "self" "__self"))
