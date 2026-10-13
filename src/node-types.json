@@ -76,6 +76,10 @@
         "named": true
       },
       {
+        "type": "function",
+        "named": true
+      },
+      {
         "type": "identifier",
         "named": true
       },
@@ -114,7 +118,15 @@
       "required": false,
       "types": [
         {
+          "type": "ellipsis",
+          "named": true
+        },
+        {
           "type": "expression",
+          "named": true
+        },
+        {
+          "type": "labeled_argument",
           "named": true
         }
       ]
@@ -321,6 +333,10 @@
             "named": true
           },
           {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
             "type": "selector_expression",
             "named": true
           }
@@ -455,6 +471,42 @@
         },
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "result": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "parameters",
           "named": true
         }
       ]
@@ -641,6 +693,32 @@
     }
   },
   {
+    "type": "labeled_argument",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "let_clause",
     "named": true,
     "fields": {
@@ -776,6 +854,75 @@
       "types": [
         {
           "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parameter",
+    "named": true,
+    "fields": {
+      "default": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "postfix_alias",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parameters",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ellipsis",
+          "named": true
+        },
+        {
+          "type": "parameter",
           "named": true
         }
       ]
@@ -1419,6 +1566,10 @@
     "named": false
   },
   {
+    "type": "->",
+    "named": false
+  },
+  {
     "type": ".",
     "named": false
   },
@@ -1569,6 +1720,10 @@
   },
   {
     "type": "for",
+    "named": false
+  },
+  {
+    "type": "func",
     "named": false
   },
   {

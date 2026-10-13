@@ -32,7 +32,7 @@ tree-sitter test
 # Run all tests (corpus tests, the CUE syntax corpus, real CUE files)
 npm test
 
-# Run only tree-sitter corpus tests
+# Run only the tree-sitter corpus and highlight tests
 tree-sitter test
 
 # Parse the copy of the CUE syntax corpus in test/syntax
