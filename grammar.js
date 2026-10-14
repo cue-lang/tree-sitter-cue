@@ -160,6 +160,10 @@ module.exports = grammar({
     [$.comprehension],
     [$._label_name, $._keyword_reference],
     [$._keyword_reference, $.try_clause],
+    [$._keyword_reference, $.guard_clause],
+    [$._keyword_reference, $.for_clause],
+    [$._keyword_reference, $.let_clause],
+    [$._label_name, $._keyword_reference, $.guard_clause],
     [$.primary_expression, $.parameter],
     [$._attr_item],
   ],
@@ -386,16 +390,19 @@ module.exports = grammar({
 
     _value: $ => alias($._alias_expr, $.value),
 
-    for_clause: $ => seq(
+    // if, for and let may also be references followed by the next
+    // declaration, as in if and then b: 1 on the next line, so the parser
+    // keeps both readings until a token decides, as for try.
+    for_clause: $ => prec(-3, seq(
       'for',
       choice($.identifier, '_'),
       optional(seq(',', choice($.identifier, '_'))),
       'in', $.expression,
-    ),
+    )),
 
-    guard_clause: $ => seq('if', field('condition', $.expression)),
+    guard_clause: $ => prec(-3, seq('if', field('condition', $.expression))),
 
-    let_clause: $ => seq('let', field('left', $.identifier), '=', field('right', $.expression)),
+    let_clause: $ => prec(-3, seq('let', field('left', $.identifier), '=', field('right', $.expression))),
 
     _clause: $ => choice($.for_clause, $.guard_clause, $.let_clause, $.try_clause),
 
