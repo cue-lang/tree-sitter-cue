@@ -134,8 +134,12 @@ static bool scan_hash_start(Scanner *s, TSLexer *lexer,
     advance(lexer);
     if (lexer->lookahead == quote) {
       advance(lexer);
-      lexer->mark_end(lexer);
-      multiline = true;
+      // A multiline literal starts with a newline after its three quotes;
+      // otherwise, as in #"""#, the literal is one line holding a quote.
+      if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+        lexer->mark_end(lexer);
+        multiline = true;
+      }
     }
   }
   enum TokenType symbol =

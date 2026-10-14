@@ -114,8 +114,15 @@ raw strings holding a quote
 
 a: #"""#
 b: #"""#
+c: ##"""##
+d: #'''#
+e: 1
 
 ---
 
 (source_file
- (field (label (identifier)) (value (string))))
+ (field (label (identifier)) (value (string)))
+ (field (label (identifier)) (value (string)))
+ (field (label (identifier)) (value (string)))
+ (field (label (identifier)) (value (string)))
+ (field (label (identifier)) (value (number))))
