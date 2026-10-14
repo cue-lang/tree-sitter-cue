@@ -479,3 +479,52 @@ d: {if(x) && (x) {e: 1}}
        left: (parenthesized_expression (identifier))
        right: (parenthesized_expression (identifier))))
      (struct_lit (field (label (identifier)) (value (number)))))))))
+
+===
+if, for and let as references followed by a declaration
+===
+
+x: {
+	if
+	b: 1
+}
+y: {
+	for
+	c: 1
+}
+z: {
+	let
+	d: 1
+}
+w: {
+	if
+	-1
+}
+
+---
+
+(source_file
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (identifier)
+    (field (label (identifier)) (value (number))))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (identifier)
+    (field (label (identifier)) (value (number))))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (identifier)
+    (field (label (identifier)) (value (number))))))
+ (field
+  (label (identifier))
+  (value
+   (struct_lit
+    (identifier)
+    (unary_expression argument: (number))))))
