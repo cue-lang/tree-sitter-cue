@@ -107,3 +107,15 @@ y: '''
   (interpolation (identifier)) (interpolation (identifier)))))
  (field (label (identifier)) (value (string
   (interpolation (identifier)) (interpolation (identifier))))))
+
+===
+raw strings holding a quote
+===
+
+a: #"""#
+b: #"""#
+
+---
+
+(source_file
+ (field (label (identifier)) (value (string))))
