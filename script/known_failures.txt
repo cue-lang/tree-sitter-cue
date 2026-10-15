@@ -1,2 +1,0 @@
-cue/encoding/protobuf/testdata/cue.mod/module.cue
-cue/cue/parser/testdata/cue.mod/module.cue
