@@ -49,8 +49,10 @@ npm run lint
 ```
 
 `test/syntax` is a copy of the syntax corpus that cue-lang/cue keeps at
-`cue/parser/testdata/syntax`: one file per syntax shape, in `pass/` (valid),
-`preview/` (valid with a preview experiment) or `fail/` (rejected).
+`cue/parser/testdata/syntax`: one file per syntax shape, each starting
+with a header that states CUE's parser outcome for each language version.
+A file is valid if a header line has the outcome `ok`: some language
+version accepts it, perhaps only with an experiment.
 `script/parse-syntax-corpus` fails if a valid file has an ERROR or MISSING
 node, unless `test/syntax/KNOWN_GAPS` lists it, and if a listed file parses
 cleanly; a missing `KNOWN_GAPS` lists no file. With `--update`, the script

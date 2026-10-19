@@ -38,9 +38,9 @@ npm run lint           # lint grammar.js
 ## Testing
 
 - `tree-sitter test` — runs corpus tests from `test/corpus/` and highlight tests from `test/highlight/`
-- `script/parse-syntax-corpus` — parses the copy of the CUE syntax corpus in `test/syntax/`; files in its `pass/`
-  and `preview/` directories must parse without ERROR or MISSING nodes unless `test/syntax/KNOWN_GAPS` lists them,
-  and a listed file that parses fails the run; a missing `test/syntax/KNOWN_GAPS` lists no file
+- `script/parse-syntax-corpus` — parses the copy of the CUE syntax corpus in `test/syntax/`; files with a header
+  line `// versions: ...; outcome: ok` must parse without ERROR or MISSING nodes unless `test/syntax/KNOWN_GAPS`
+  lists them, and a listed file that parses fails the run; a missing `test/syntax/KNOWN_GAPS` lists no file
 - `script/parse-syntax-corpus --update` — removes the listed files that parse from `test/syntax/KNOWN_GAPS`, and
   deletes it once it lists none; it never adds a file
 - `script/sync-syntax-corpus <cue-checkout>` — refreshes `test/syntax/` from a cue-lang/cue checkout at a tag,

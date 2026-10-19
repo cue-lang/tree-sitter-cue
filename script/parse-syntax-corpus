@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
-# Parses the copy of the CUE syntax corpus in test/syntax. Each file that
-# must be valid fails the run if its tree has an ERROR or MISSING node,
-# unless test/syntax/KNOWN_GAPS lists it; a listed file that parses cleanly
-# also fails the run, so the list cannot go stale. Files that must be valid
-# are those in pass/ and preview/, and the fail/prefix_alias_* files, whose
-# syntax is still valid at language versions before v0.18.0. KNOWN_GAPS names
-# files by their path in test/syntax, as in pass/alias_postfix_paren.cue; a
-# missing KNOWN_GAPS lists no file.
+# Parses the copy of the CUE syntax corpus in test/syntax. Each corpus file
+# starts with a header stating the CUE parser's outcome for each language
+# version, one line per run of versions, as in
+#
+#	// versions: v0.8.0..v0.17.0; outcome: ok
+#	// versions: v0.18.0..; outcome: error 3:2: old-style alias syntax ...
+#
+# A file must be valid if any header line has the outcome ok: some language
+# version accepts it, perhaps only with the experiments the line names. Each
+# file that must be valid fails the run if its tree has an ERROR or MISSING
+# node, unless test/syntax/KNOWN_GAPS lists it; a listed file that parses
+# cleanly also fails the run, so the list cannot go stale. KNOWN_GAPS names
+# only files that must be valid, as in alias_postfix_paren.cue; a missing
+# KNOWN_GAPS lists no file. A file without a header fails the run.
 #
 # With --update, the script removes the listed files that parse cleanly from
 # KNOWN_GAPS instead of failing, and deletes KNOWN_GAPS once it lists no
@@ -45,12 +51,29 @@ for name in $gaps; do
 done
 
 cd "$ROOT"
+# valid succeeds if a header line of the corpus file $1 has the outcome ok.
+valid() {
+	awk '!/^\/\/ versions: /{exit} /^\/\/ versions: [^;]*(; experiments: [^;]*)?; outcome: ok$/{ok=1} END{exit !ok}' "$1"
+}
+
 parsed=()
-for file in "$CORPUS"/pass/*.cue "$CORPUS"/preview/*.cue "$CORPUS"/fail/prefix_alias_*.cue; do
+for file in "$CORPUS"/*.cue; do
 	name=${file#"$CORPUS"/}
+	if ! head -n 1 "$file" | grep -q '^// versions: '; then
+		echo "$name: no header; refresh the copy with script/sync-syntax-corpus"
+		status=1
+		continue
+	fi
 	listed=false
 	if grep -qxF "$name" <<<"$gaps"; then
 		listed=true
+	fi
+	if ! valid "$file"; then
+		if $listed; then
+			echo "KNOWN_GAPS names $name, which no language version accepts"
+			status=1
+		fi
+		continue
 	fi
 	if tree-sitter parse -q "$file" >/dev/null 2>&1; then
 		if $listed; then
