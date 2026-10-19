@@ -2,9 +2,10 @@
 
 # Refreshes the copy of the CUE syntax corpus in test/syntax from a checkout
 # of cue-lang/cue, which must be exactly at a tag, and records the tag in
-# test/syntax/SOURCE. The corpus is the pass, preview and fail directories;
-# corpus files that the checkout no longer has are removed. Run
-# script/parse-syntax-corpus afterwards.
+# test/syntax/SOURCE. The corpus is the .cue files in the checkout's
+# cue/parser/testdata/syntax; corpus files that the checkout no longer has,
+# and any directories, are removed. Run script/parse-syntax-corpus
+# afterwards.
 #
 # Usage: script/sync-syntax-corpus <cue-checkout>
 
@@ -26,26 +27,20 @@ CORPUS=$(dirname "$SCRIPT_DIR")/test/syntax
 src=$checkout/cue/parser/testdata/syntax
 
 shopt -s nullglob
-dirs=(pass preview fail)
-for dir in "${dirs[@]}"; do
-	files=("$src/$dir"/*.cue)
-	if [ ${#files[@]} -eq 0 ]; then
-		echo "no corpus files in $src/$dir" >&2
-		exit 1
+files=("$src"/*.cue)
+if [ ${#files[@]} -eq 0 ]; then
+	echo "no corpus files in $src" >&2
+	exit 1
+fi
+
+for old in "$CORPUS"/*.cue; do
+	if [ ! -f "$src/$(basename "$old")" ]; then
+		rm "$old"
 	fi
 done
-
-count=0
-for dir in "${dirs[@]}"; do
-	mkdir -p "$CORPUS/$dir"
-	for old in "$CORPUS/$dir"/*.cue; do
-		if [ ! -f "$src/$dir/$(basename "$old")" ]; then
-			rm "$old"
-		fi
-	done
-	files=("$src/$dir"/*.cue)
-	cp "${files[@]}" "$CORPUS/$dir"/
-	count=$((count + ${#files[@]}))
+for old in "$CORPUS"/*/; do
+	rm -r "$old"
 done
+cp "${files[@]}" "$CORPUS"/
 echo "cue-lang/cue $tag" >"$CORPUS/SOURCE"
-echo "copied $count corpus files from cue-lang/cue $tag"
+echo "copied ${#files[@]} corpus files from cue-lang/cue $tag"
