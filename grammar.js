@@ -145,6 +145,7 @@ module.exports = grammar({
 
   inline: $ => [
     $.keyword_identifier,
+    $._any_identifier,
   ],
 
   supertypes: $ => [
@@ -187,7 +188,7 @@ module.exports = grammar({
 
     package_clause: $ => seq(
       'package',
-      $._package_identifier,
+      alias($._any_identifier, $.package_identifier),
     ),
 
     import_declaration: $ => seq(
@@ -213,14 +214,36 @@ module.exports = grammar({
       ')',
     ),
 
+    // An identifier, except one starting with __, which CUE reserves: see
+    // _reserved_identifier.
     identifier: _ => token(choice(
       seq(
-        optional(choice('_#', '#', '_')),
-        choice(/\p{L}/, '$', '_'),
+        optional(choice('_#', '#')),
+        choice(/\p{L}/, '$'),
+        repeat(choice(/\p{L}/, '$', '_', /[0-9]/)),
+      ),
+      seq(
+        choice('_#', '#'),
+        '_',
+        repeat(choice(/\p{L}/, '$', '_', /[0-9]/)),
+      ),
+      seq(
+        '_',
+        choice(/\p{L}/, '$', /[0-9]/),
         repeat(choice(/\p{L}/, '$', '_', /[0-9]/)),
       ),
       choice('_#', '#', '_'),
     )),
+
+    // An identifier starting with __. CUE reserves these: it accepts them in
+    // references, selectors, postfix aliases, parameters, labeled arguments,
+    // attribute names, try clauses and the package clause, but not as the
+    // name that a field label, let or for clause, prefix alias or import
+    // declares.
+    _reserved_identifier: _ => token(seq('__', repeat(choice(/\p{L}/, '$', '_', /[0-9]/)))),
+
+    // An identifier where CUE also accepts one starting with __.
+    _any_identifier: $ => choice($.identifier, alias($._reserved_identifier, $.identifier)),
     keyword_identifier: $ => prec(-3, alias(
       choice(
         'let',
@@ -238,7 +261,7 @@ module.exports = grammar({
 
     attribute: $ => seq(
       '@',
-      field('name', $.identifier),
+      field('name', $._any_identifier),
       '(',
       optional(choice(',', '-')),
       repeat($._attr_group),
@@ -278,7 +301,7 @@ module.exports = grammar({
       prec(-1, /[^0-9_]/),
     ),
     attr_path: _ => /(?:\/[\p{L}\d\.]+)*[\p{L}\d\.]+(?:\/[\p{L}\d\.]+)*(?:\/)?/,
-    package_path: $ => seq($.identifier, repeat1(seq('.', $.identifier))),
+    package_path: $ => seq($._any_identifier, repeat1(seq('.', $._any_identifier))),
 
     builtin_function: _ => choice(
       'len',
@@ -302,6 +325,12 @@ module.exports = grammar({
       $.let_clause,
     )),
 
+    _closed_list_elem: $ => prec.right(seq(
+      $._embedding,
+      optional(repeat(seq(',', $._embedding))),
+      optional(','),
+    )),
+
     _list_elem: $ => prec.right(choice(
       $.ellipsis,
       seq(
@@ -317,7 +346,11 @@ module.exports = grammar({
     // A list may start with the '[' that directly follows a word, as in
     // if[x][0] {...}, where the guard of a comprehension and an index on a
     // reference to if both begin; the clause wins.
-    list_lit: $ => seq(optional($._closed), choice('[', token.immediate('[')), repeat($._list_elem), ']'),
+    // As in CUE's parser, a closed list holds no ellipsis.
+    list_lit: $ => choice(
+      seq($._closed, choice('[', token.immediate('[')), repeat($._closed_list_elem), ']'),
+      seq(choice('[', token.immediate('[')), repeat($._list_elem), ']'),
+    ),
 
     struct_lit: $ => seq(
       optional($._closed),
@@ -376,9 +409,9 @@ module.exports = grammar({
     postfix_alias: $ => seq(
       '~',
       choice(
-        field('field', $.identifier),
-        seq('(', field('field', $.identifier), ')'),
-        seq('(', field('label', $.identifier), ',', field('field', $.identifier), ')'),
+        field('field', $._any_identifier),
+        seq('(', field('field', $._any_identifier), ')'),
+        seq('(', field('label', $._any_identifier), ',', field('field', $._any_identifier), ')'),
       ),
     ),
 
@@ -411,7 +444,7 @@ module.exports = grammar({
     // until a token decides.
     try_clause: $ => prec(-3, seq(
       'try',
-      optional(seq(field('left', choice($.identifier, '_')), '=', field('right', $.expression))),
+      optional(seq(field('left', choice($._any_identifier, '_')), '=', field('right', $.expression))),
     )),
 
     // A word after the struct may start an else clause or, when CUE ends
@@ -447,7 +480,7 @@ module.exports = grammar({
       $.call_expression,
       $.postfix_expression,
       $.spread_expression,
-      $.identifier,
+      $._any_identifier,
       $.literal,
     ),
 
@@ -546,7 +579,7 @@ module.exports = grammar({
     parameter: $ => seq(
       optional(choice(
         seq(
-          field('name', $.identifier),
+          field('name', $._any_identifier),
           optional($.postfix_alias),
           optional(choice('?', '!')),
           ':',
@@ -588,7 +621,7 @@ module.exports = grammar({
     selector_expression: $ => prec(PREC.call, seq(
       $.primary_expression,
       '.',
-      choice($.identifier, alias($._simple_string_lit, $.string)),
+      choice($._any_identifier, alias($._simple_string_lit, $.string)),
     )),
 
     // A trailing ellipsis applies a function partially, as in f(1, ...).
@@ -602,7 +635,7 @@ module.exports = grammar({
     ),
 
     labeled_argument: $ => seq(
-      field('label', $.identifier),
+      field('label', $._any_identifier),
       ':',
       field('value', $.expression),
     ),
