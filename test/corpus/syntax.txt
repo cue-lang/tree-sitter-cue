@@ -923,3 +923,125 @@ h: func(int)(1)
     (value (call_expression
       (function (parameters (parameter (primitive_type))))
       (arguments (number))))))
+
+=====================================
+reserved names where CUE accepts them
+=====================================
+
+@__i(x)
+
+a: __self
+b~__X: 1
+c: d.__e
+e: f(__g: 1)
+h: func(__p: int) -> int
+
+---
+
+(source_file
+  (attribute
+    name: (identifier)
+    (identifier))
+  (field
+    (label
+      (identifier))
+    (value
+      (identifier)))
+  (field
+    (label
+      (identifier)
+      (postfix_alias
+        field: (identifier)))
+    (value
+      (number)))
+  (field
+    (label
+      (identifier))
+    (value
+      (selector_expression
+        (identifier)
+        (identifier))))
+  (field
+    (label
+      (identifier))
+    (value
+      (call_expression
+        function: (identifier)
+        (arguments
+          (labeled_argument
+            label: (identifier)
+            value: (number))))))
+  (field
+    (label
+      (identifier))
+    (value
+      (function
+        (parameters
+          (parameter
+            name: (identifier)
+            type: (primitive_type)))
+        result: (primitive_type)))))
+
+===================================
+reserved name in the package clause
+===================================
+
+package __p
+
+a: 1
+
+---
+
+(source_file
+  (package_clause
+    (package_identifier))
+  (field
+    (label
+      (identifier))
+    (value
+      (number))))
+
+==============================
+reserved name as a field label
+:error
+==============================
+
+__x: 1
+
+---
+
+=============================
+reserved name in a let clause
+:error
+=============================
+
+let __y = 1
+
+---
+
+==========================
+reserved name in an import
+:error
+==========================
+
+import __s "strings"
+
+---
+
+=========================
+ellipsis in a closed list
+:error
+=========================
+
+a: #[1, ...]
+
+---
+
+===============================
+closed list of only an ellipsis
+:error
+===============================
+
+a: #[...]
+
+---
